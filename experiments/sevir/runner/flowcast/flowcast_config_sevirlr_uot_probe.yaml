@@ -1,0 +1,139 @@
+# THROWAWAY calibration probe for the SEVIR-LR UOT weight. Not a training run.
+#
+# Identical to flowcast_config_sevirlr_uot.yaml except:
+#   - warmup_steps: 0        (read the FULL-strength uot_ratio immediately;
+#                             under the real 19400-step ramp the early ratio
+#                             would be scaled down and unreadable)
+#   - partial_evaluation off (no evaluation needed, just the loss printout)
+#   - save_latest_every_batches: 0 and probe-specific run_string/resume path
+#     (no 4.4 GB checkpoints from a run we kill after ~100 iterations)
+#
+# Procedure: run ~100 iterations on a free GPU, read uot_ratio from the tqdm
+# postfix in the log, then set the real config's weight to
+#   0.0005 * target_ratio / observed_ratio   (target ~0.10, band 0.05-0.20)
+# since the UOT term is linear in weight while the base loss is not affected.
+# Kill the probe afterwards; it shares no artifacts with the twins.
+
+stdit:
+  hidden_size: 1024
+  depth: 12
+  num_heads: 8
+  patch_size: [1, 2, 2]
+  mlp_ratio: 4.0
+  drop_path: 0.0
+  qk_norm: true
+
+rflow_params:
+  num_train_timesteps: 1000
+
+sampling_params:
+  euler_steps: 10
+
+training_params:
+  # Same micro batch as the twins so this run doubles as the OOM check for
+  # the UOT arm's 2 x 20 = 40 grad-retaining pixel decodes.
+  micro_batch_size: 2
+  grad_accumulation_steps: 2
+  num_epochs: 1
+  num_workers: 12
+  early_stopping_patience: 50
+  # val_loss because partial evaluation is off; the probe never reaches an
+  # epoch boundary anyway.
+  early_stopping_metric: "val_loss"
+  gradient_clip_val: 1.0
+  fp16: true
+  save_latest_every_batches: 0
+
+optimizer_params:
+  learning_rate: 0.0005
+  optimizer_type: "adamw"
+  weight_decay: 0.0001
+
+scheduler_params:
+  scheduler_type: "cosine"
+  lr_plateau_factor: 0.2
+  lr_plateau_patience: 6
+  lr_cosine_warmup_iter_percentage: 0.01
+  lr_cosine_min_warmup_lr_ratio: 0.1
+  lr_cosine_min_lr_ratio: 0.01
+
+data_params:
+  dataset_name: "sevir"
+  data_key: "vil"
+  raw_seq_len: 25
+  input_length: 5
+  output_length: 20
+  lag_time: 5
+  lead_time: 20
+  time_spacing: 1
+  stride: 25
+
+evaluation_params:
+  pixel_scale: 255.0
+  thresholds: [16, 74, 133, 160, 181, 219]
+
+run_params:
+  debug_mode: false
+  enable_wandb: false
+  run_string: "sevirlr_uot_probe"
+  preload_model: null
+  resume_latest_path: "artifacts/sevir_lr/flowcast/sevirlr_uot_probe_latest.pt"
+
+partial_evaluation_params:
+  partial_evaluation: false
+  partial_evaluation_interval: 1
+  partial_evaluation_batches: 40
+  cartopy_features: false
+
+autoencoder_params:
+  autoencoder_checkpoint: "${DATA_ROOT}/saved_models/sevir/autoencoder/models/early_stopping_model.pt"
+  normalized_autoencoder: true
+  latent_channels: 4
+  norm_num_groups: 32
+  layers_per_block: 2
+  act_fn: "silu"
+  block_out_channels: [128, 256, 512, 512]
+  down_block_types:
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+  up_block_types:
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+
+ema_model_saving_params:
+  ema_model_saving: true
+  ema_model_saving_decay: 0.999
+
+test_params:
+  micro_batch_size: 6
+  num_workers: 12
+  probabilistic_samples: 1
+  batch_size_autoencoder: 12
+  euler_steps: 10
+  cartopy_features: false
+
+uot_params:
+  enabled: true
+  mass_transform: "vil"
+  mass_low_threshold: 16.0
+  threshold_mode: "soft"
+  threshold_softness: 4.0
+  mass_gamma: 1.0
+  mass_scale: 100.0
+  mass_zero_point: 0.0
+  value_scale_ref: 1.0
+  weight: 0.0005
+  t_power: 1.0
+  normalize_by_mass: false
+  dry_frame_mass: 0.001
+  # Probe only: no ramp, so the logged uot_ratio is the full-strength value.
+  warmup_steps: 0
+  blur: 3.0
+  reach: 16.0
+  downsample: 4
+  n_iters: 100
+  self_iters: 50

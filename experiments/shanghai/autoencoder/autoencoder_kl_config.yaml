@@ -1,0 +1,81 @@
+# Shanghai (DiffCast 1535/527 events, 128x128, dBZ*255/90) AutoencoderKL.
+# Same architecture as every other dataset's VAE (latent 4ch, 8x spatial
+# downsample -> 16x16x4 latents), copied from the meteonet config, which is
+# the closest analog (also 90-scale radar dBZ).
+#
+# micro_batch_size 2 (not meteonet's 3) because this trains on a GPU SHARED
+# with the running SEVIR-LR UOT arm (~17 GB headroom): a VAE OOM on that card
+# could take down the 5-day UOT run with it. Raise it only on a free card.
+
+run_params:
+  debug_mode: false
+  enable_wandb: false  # server has no outbound internet
+  run_string: "autoencoder_kl_shanghai"
+
+data_params:
+  dataset_name: "shanghai"
+  data_key: "vil"
+  raw_seq_len: 25
+
+training_params:
+  preload_model: null
+  micro_batch_size: 2
+  normalize_dataset: true
+  num_epochs: 250
+  num_workers: 8
+  # DISCRIMINATOR DISABLED (first attempt used the CIKM value 35 and the GAN
+  # diverged the moment it activated: disc loss 1.5k -> 41k monotonically,
+  # recon val loss 64 -> 20564, decoder bias -4.55 dBZ, 20% negative pixels,
+  # test-set oracle ceiling CSI@40 = 0.126 vs CIKM's 0.84. Shanghai's sparse
+  # mostly-zero echoes let the discriminator win trivially, and the adaptive
+  # d_weight then amplifies its diverged gradients into the decoder. The
+  # pure-reconstruction phase (epochs 0-35) was healthy and still improving,
+  # so this run is plain L1+KL: warmup longer than num_epochs never activates
+  # the disc, and early stopping then tracks clean reconstruction val loss.
+  warmup_generator_epochs: 9999
+  early_stopping_patience: 50
+  gradient_clip_val: 1.0
+
+optimizer_params:
+  learning_rate: 1.0e-4
+  optimizer_type: "adamw"
+  weight_decay: 1.0e-5
+
+scheduler_params:
+  scheduler_type: "cosine"
+  lr_plateau_factor: 0.2
+  lr_plateau_patience: 6
+  lr_cosine_warmup_iter_percentage: 0.2
+  lr_cosine_min_warmup_lr_ratio: 0.1
+  lr_cosine_min_lr_ratio: 1.0e-3
+
+model_params:
+  latent_channels: 4
+  norm_num_groups: 32
+  layers_per_block: 2
+  act_fn: "silu"
+  # 8x spatial compression (16x16x4 latent), identical to CIKM/SEVIR.
+  # A 4x variant was briefly tried when the AE oracle reported a CSI-M
+  # ceiling of 0.375; that reading was a unit bug in raw_to_eval_scale (truth
+  # left on the 0-255 scale while predictions were scaled to 0-90 dBZ), not a
+  # capacity limit. With the bug fixed this 8x AE measures 0.810 CSI-M on the
+  # test split -- ~2x the published SOTA of 0.4089 -- so 8x stands.
+  block_out_channels: [128, 256, 512, 512]
+  down_block_types:
+    [
+      "DownEncoderBlock2D",
+      "DownEncoderBlock2D",
+      "DownEncoderBlock2D",
+      "DownEncoderBlock2D",
+    ]
+  up_block_types:
+    [
+      "UpDecoderBlock2D",
+      "UpDecoderBlock2D",
+      "UpDecoderBlock2D",
+      "UpDecoderBlock2D",
+    ]
+
+loss_params:
+  kl_weight: 1.0e-4
+  disc_weight: 0.5

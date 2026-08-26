@@ -1,0 +1,154 @@
+# THROWAWAY weight-calibration probe for the Shanghai UOT arm. Same recipe
+# as the SEVIR-LR probe: warmup 0 so the logged uot_ratio is full-strength,
+# no partial eval, no checkpoint writes; run ~15 min on ONE free GPU, average
+# ~60 uot_ratio readings, set the real config's weight to
+#   0.0005 * 0.10 / mean_ratio,   then kill this run.
+#
+# Data: DiffCast's official shanghai.h5 (what SDIR/DuoCast also train on),
+# converted by datasets/shanghai/shanghai_diffcast_to_h5.py: 128x128, 25
+# frames, dBZ*255/90. Split train 1381 / val 153 (last 10% of official train,
+# event order) / test 526 (official test untouched). Protocol 5 -> 20,
+# pixel_scale 90, thresholds [20, 30, 35, 40] = the DiffCast/SDIR table
+# protocol, so numbers land on their published scale.
+#
+# Twin rules (same as SEVIR-LR): run with the SAME world_size / micro batch /
+# accum as the UOT arm, sequentially on the same 3 cards. seed 42 is
+# hard-coded in dist_train_flowcast.py, so equal shapes => identical noise
+# stream and data order.
+
+stdit:
+  hidden_size: 1024
+  depth: 12
+  num_heads: 8
+  patch_size: [1, 2, 2]
+  mlp_ratio: 4.0
+  drop_path: 0.0
+  qk_norm: true
+
+rflow_params:
+  num_train_timesteps: 1000
+
+sampling_params:
+  euler_steps: 10
+
+training_params:
+  # 3-GPU DDP: micro 2 x accum 1 x world 3 = effective batch 6. micro 2 is
+  # the UOT arm's memory ceiling (40 grad-retaining pixel decodes); both arms
+  # must match it exactly or the pairing breaks.
+  micro_batch_size: 2
+  grad_accumulation_steps: 1
+  num_epochs: 1
+  num_workers: 12
+  early_stopping_patience: 50
+  early_stopping_metric: "val_loss"  # partial eval is off in the probe
+  gradient_clip_val: 1.0
+  fp16: true
+  # 230 iters/epoch on 3 cards -- save twice an epoch, not every other epoch.
+  save_latest_every_batches: 0
+
+optimizer_params:
+  learning_rate: 0.0005
+  optimizer_type: "adamw"
+  weight_decay: 0.0001
+
+scheduler_params:
+  scheduler_type: "cosine"
+  lr_plateau_factor: 0.2
+  lr_plateau_patience: 6
+  lr_cosine_warmup_iter_percentage: 0.01
+  lr_cosine_min_warmup_lr_ratio: 0.1
+  lr_cosine_min_lr_ratio: 0.01
+
+data_params:
+  dataset_name: "shanghai"
+  data_key: "vil"
+  raw_seq_len: 25
+  input_length: 5
+  output_length: 20
+  lag_time: 5
+  lead_time: 20
+  time_spacing: 1
+  # 25 == lag + lead, exactly one window per event.
+  stride: 25
+
+evaluation_params:
+  pixel_scale: 90.0
+  thresholds: [20, 30, 35, 40]
+
+run_params:
+  debug_mode: false
+  enable_wandb: false
+  run_string: "shanghai_uot_probe"
+  preload_model: null
+  resume_latest_path: "artifacts/shanghai/flowcast/shanghai_uot_probe_latest.pt"
+
+partial_evaluation_params:
+  partial_evaluation: false
+  partial_evaluation_interval: 1
+  # 153-sequence val set; 40 x 6 caps out, i.e. the FULL val set every epoch.
+  partial_evaluation_batches: 40
+  cartopy_features: false
+
+autoencoder_params:
+  # Canonical path; the trained Shanghai AE artifact gets copied here (the
+  # trainer writes to a timestamped artifacts/ dir). Trained 2026-07-28 on
+  # the Shanghai train split only -- no val/test leakage.
+  autoencoder_checkpoint: "${DATA_ROOT}/saved_models/shanghai/autoencoder/models/early_stopping_model.pt"
+  normalized_autoencoder: true
+  latent_channels: 4
+  norm_num_groups: 32
+  layers_per_block: 2
+  act_fn: "silu"
+  block_out_channels: [128, 256, 512, 512]
+  down_block_types:
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+  up_block_types:
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+
+ema_model_saving_params:
+  ema_model_saving: true
+  ema_model_saving_decay: 0.999
+
+test_params:
+  micro_batch_size: 6
+  num_workers: 12
+  probabilistic_samples: 1
+  batch_size_autoencoder: 12
+  euler_steps: 10
+  cartopy_features: false
+
+uot_params:
+  enabled: true
+  # dBZ radar physics: same mass transform family as CIKM v4 (zr_dbz Z-R
+  # conversion), NOT the SEVIR "vil" block -- Shanghai pixels are dBZ*255/90
+  # exactly like CIKM's, pixel_scale 90, floor 0.5 dBZ.
+  mass_transform: "zr_dbz"
+  mass_low_threshold: 0.5
+  threshold_mode: "soft"
+  threshold_softness: 1.0
+  mass_gamma: 1.0
+  mass_scale: 10.0
+  mass_zero_point: 0.0
+  # Single-knob policy (like SEVIR-LR): M_ref at identity, calibrate `weight`
+  # by probe until uot_ratio ~0.10 (5-20% band). 0.0005 is the PROBE STARTING
+  # POINT, to be replaced by the measured scaling before the real run.
+  value_scale_ref: 1.0
+  weight: 0.0005
+  t_power: 1.0
+  normalize_by_mass: false
+  dry_frame_mass: 0.001
+  # ~2 epochs: global_step advances by per-rank micro_batch, one epoch on
+  # 3 GPUs = 1381 / 3 ~= 460 steps.
+  warmup_steps: 0
+  blur: 4.0
+  reach: 16.0
+  # 128 / 4 = 32; sum_pool2d needs the factor to divide the side exactly.
+  downsample: 4
+  n_iters: 100
+  self_iters: 50

@@ -10,6 +10,13 @@ from .display import get_cmap
 import cartopy.feature as cfeature
 
 
+def _has_geo_metadata(info):
+    required_keys = ["proj", "llcrnrlon", "llcrnrlat", "urcrnrlon", "urcrnrlat"]
+    if info is None:
+        return False
+    return all(key in info for key in required_keys)
+
+
 def plot_pair_frames(
     frame1,
     frame2,
@@ -51,81 +58,110 @@ def plot_pair_frames(
     matplotlib.figure.Figure
         The figure object.
     """
-    proj1, img_extent1 = make_ccrs(meta1)
-    proj2, img_extent2 = make_ccrs(meta2)
-
     cmap, norm, vmin, vmax = get_cmap(img_type)
+    if _has_geo_metadata(meta1) and _has_geo_metadata(meta2):
+        proj1, img_extent1 = make_ccrs(meta1)
+        proj2, img_extent2 = make_ccrs(meta2)
 
-    fig, axs = plt.subplots(1, 2, figsize=(10, 5), subplot_kw={"projection": proj1})
-    axs[0].imshow(
-        frame1,
-        interpolation="nearest",
-        origin="lower",
-        extent=img_extent1,
-        cmap=cmap,
-        norm=norm,
-        vmin=vmin,
-        vmax=vmax,
-        transform=proj1,
-        **kwargs,
-    )
-    if cartopy_features:
-        axs[0].add_feature(
-            cfeature.STATES.with_scale("50m"),
-            linewidth=0.3,
-            edgecolor="black",
-            zorder=3,
+        fig, axs = plt.subplots(
+            1, 2, figsize=(10, 5), subplot_kw={"projection": proj1}
         )
-        axs[0].add_feature(
-            cfeature.LAKES.with_scale("50m"),
-            edgecolor="cornflowerblue",
-            alpha=0.5,
-            linewidth=0.3,
-            zorder=3,
+        axs[0].imshow(
+            frame1,
+            interpolation="nearest",
+            origin="lower",
+            extent=img_extent1,
+            cmap=cmap,
+            norm=norm,
+            vmin=vmin,
+            vmax=vmax,
+            transform=proj1,
+            **kwargs,
         )
-        axs[0].add_feature(
-            cfeature.RIVERS.with_scale("50m"),
-            edgecolor="cornflowerblue",
-            alpha=0.5,
-            linewidth=0.3,
-            zorder=3,
-        )
-    axs[0].set_title(title_frame1)
+        if cartopy_features:
+            axs[0].add_feature(
+                cfeature.STATES.with_scale("50m"),
+                linewidth=0.3,
+                edgecolor="black",
+                zorder=3,
+            )
+            axs[0].add_feature(
+                cfeature.LAKES.with_scale("50m"),
+                edgecolor="cornflowerblue",
+                alpha=0.5,
+                linewidth=0.3,
+                zorder=3,
+            )
+            axs[0].add_feature(
+                cfeature.RIVERS.with_scale("50m"),
+                edgecolor="cornflowerblue",
+                alpha=0.5,
+                linewidth=0.3,
+                zorder=3,
+            )
+        axs[0].set_title(title_frame1)
 
-    axs[1].imshow(
-        frame2,
-        interpolation="nearest",
-        origin="lower",
-        extent=img_extent2,
-        cmap=cmap,
-        norm=norm,
-        vmin=vmin,
-        vmax=vmax,
-        transform=proj2,
-        **kwargs,
-    )
-    if cartopy_features:
-        axs[1].add_feature(
-            cfeature.STATES.with_scale("50m"),
-            linewidth=0.3,
-            edgecolor="black",
-            zorder=3,
+        axs[1].imshow(
+            frame2,
+            interpolation="nearest",
+            origin="lower",
+            extent=img_extent2,
+            cmap=cmap,
+            norm=norm,
+            vmin=vmin,
+            vmax=vmax,
+            transform=proj2,
+            **kwargs,
         )
-        axs[1].add_feature(
-            cfeature.LAKES.with_scale("50m"),
-            edgecolor="cornflowerblue",
-            alpha=0.5,
-            linewidth=0.3,
-            zorder=3,
+        if cartopy_features:
+            axs[1].add_feature(
+                cfeature.STATES.with_scale("50m"),
+                linewidth=0.3,
+                edgecolor="black",
+                zorder=3,
+            )
+            axs[1].add_feature(
+                cfeature.LAKES.with_scale("50m"),
+                edgecolor="cornflowerblue",
+                alpha=0.5,
+                linewidth=0.3,
+                zorder=3,
+            )
+            axs[1].add_feature(
+                cfeature.RIVERS.with_scale("50m"),
+                edgecolor="cornflowerblue",
+                alpha=0.5,
+                linewidth=0.3,
+                zorder=3,
+            )
+        axs[1].set_title(title_frame2)
+    else:
+        fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+        axs[0].imshow(
+            frame1,
+            interpolation="nearest",
+            origin="lower",
+            cmap=cmap,
+            norm=norm,
+            vmin=vmin,
+            vmax=vmax,
+            **kwargs,
         )
-        axs[1].add_feature(
-            cfeature.RIVERS.with_scale("50m"),
-            edgecolor="cornflowerblue",
-            alpha=0.5,
-            linewidth=0.3,
-            zorder=3,
+        axs[0].set_title(title_frame1)
+        axs[1].imshow(
+            frame2,
+            interpolation="nearest",
+            origin="lower",
+            cmap=cmap,
+            norm=norm,
+            vmin=vmin,
+            vmax=vmax,
+            **kwargs,
         )
-    axs[1].set_title(title_frame2)
+        axs[1].set_title(title_frame2)
+        for ax in axs:
+            ax.set_xticks([])
+            ax.set_yticks([])
 
     if title:
         fig.suptitle(title)
@@ -157,44 +193,57 @@ def plot_single_frame(
     matplotlib.figure.Figure
         The figure object.
     """
-    proj, img_extent = make_ccrs(meta)
-
     cmap, norm, vmin, vmax = get_cmap(img_type)
-
-    fig, ax = plt.subplots(1, 1, figsize=(5, 5), subplot_kw={"projection": proj})
-    ax.imshow(
-        frame,
-        interpolation="nearest",
-        origin="lower",
-        extent=img_extent,
-        cmap=cmap,
-        norm=norm,
-        vmin=vmin,
-        vmax=vmax,
-        transform=proj,
-        **kwargs,
-    )
-    if cartopy_features:
-        ax.add_feature(
-            cfeature.STATES.with_scale("50m"),
-            linewidth=0.3,
-            edgecolor="black",
-            zorder=3,
+    if _has_geo_metadata(meta):
+        proj, img_extent = make_ccrs(meta)
+        fig, ax = plt.subplots(1, 1, figsize=(5, 5), subplot_kw={"projection": proj})
+        ax.imshow(
+            frame,
+            interpolation="nearest",
+            origin="lower",
+            extent=img_extent,
+            cmap=cmap,
+            norm=norm,
+            vmin=vmin,
+            vmax=vmax,
+            transform=proj,
+            **kwargs,
         )
-        ax.add_feature(
-            cfeature.LAKES.with_scale("50m"),
-            edgecolor="cornflowerblue",
-            alpha=0.5,
-            linewidth=0.3,
-            zorder=3,
+        if cartopy_features:
+            ax.add_feature(
+                cfeature.STATES.with_scale("50m"),
+                linewidth=0.3,
+                edgecolor="black",
+                zorder=3,
+            )
+            ax.add_feature(
+                cfeature.LAKES.with_scale("50m"),
+                edgecolor="cornflowerblue",
+                alpha=0.5,
+                linewidth=0.3,
+                zorder=3,
+            )
+            ax.add_feature(
+                cfeature.RIVERS.with_scale("50m"),
+                edgecolor="cornflowerblue",
+                alpha=0.5,
+                linewidth=0.3,
+                zorder=3,
+            )
+    else:
+        fig, ax = plt.subplots(1, 1, figsize=(5, 5))
+        ax.imshow(
+            frame,
+            interpolation="nearest",
+            origin="lower",
+            cmap=cmap,
+            norm=norm,
+            vmin=vmin,
+            vmax=vmax,
+            **kwargs,
         )
-        ax.add_feature(
-            cfeature.RIVERS.with_scale("50m"),
-            edgecolor="cornflowerblue",
-            alpha=0.5,
-            linewidth=0.3,
-            zorder=3,
-        )
+        ax.set_xticks([])
+        ax.set_yticks([])
 
     if title:
         ax.set_title(title)
@@ -241,51 +290,67 @@ def make_animation(
     if len(frames.shape) == 4:
         frames = frames[0, :, :, :]
 
-    proj, img_extent = make_ccrs(meta)
-    if fig is None:
-        fig = plt.gcf()
-    ax = fig.add_subplot(1, 1, 1, projection=proj)
-    xll, xur = img_extent[0], img_extent[1]
-    yll, yur = img_extent[2], img_extent[3]
-    ax.set_xlim((xll, xur))
-    ax.set_ylim((yll, yur))
-
     cmap, norm, vmin, vmax = get_cmap(img_type)
+    if _has_geo_metadata(meta):
+        proj, img_extent = make_ccrs(meta)
+        if fig is None:
+            fig = plt.gcf()
+        ax = fig.add_subplot(1, 1, 1, projection=proj)
+        xll, xur = img_extent[0], img_extent[1]
+        yll, yur = img_extent[2], img_extent[3]
+        ax.set_xlim((xll, xur))
+        ax.set_ylim((yll, yur))
 
-    im = ax.imshow(
-        frames[0, :, :],
-        interpolation="nearest",
-        origin="lower",
-        extent=[xll, xur, yll, yur],
-        transform=proj,
-        cmap=cmap,
-        norm=norm,
-        vmin=vmin,
-        vmax=vmax,
-        **kwargs,
-    )
+        im = ax.imshow(
+            frames[0, :, :],
+            interpolation="nearest",
+            origin="lower",
+            extent=[xll, xur, yll, yur],
+            transform=proj,
+            cmap=cmap,
+            norm=norm,
+            vmin=vmin,
+            vmax=vmax,
+            **kwargs,
+        )
 
-    if cartopy_features:
-        ax.add_feature(
-            cfeature.STATES.with_scale("50m"),
-            linewidth=0.3,
-            edgecolor="black",
-            zorder=3,
+        if cartopy_features:
+            ax.add_feature(
+                cfeature.STATES.with_scale("50m"),
+                linewidth=0.3,
+                edgecolor="black",
+                zorder=3,
+            )
+            ax.add_feature(
+                cfeature.LAKES.with_scale("50m"),
+                edgecolor="cornflowerblue",
+                alpha=0.5,
+                linewidth=0.3,
+                zorder=3,
+            )
+            ax.add_feature(
+                cfeature.RIVERS.with_scale("50m"),
+                edgecolor="cornflowerblue",
+                alpha=0.5,
+                linewidth=0.3,
+                zorder=3,
+            )
+    else:
+        if fig is None:
+            fig = plt.gcf()
+        ax = fig.add_subplot(1, 1, 1)
+        im = ax.imshow(
+            frames[0, :, :],
+            interpolation="nearest",
+            origin="lower",
+            cmap=cmap,
+            norm=norm,
+            vmin=vmin,
+            vmax=vmax,
+            **kwargs,
         )
-        ax.add_feature(
-            cfeature.LAKES.with_scale("50m"),
-            edgecolor="cornflowerblue",
-            alpha=0.5,
-            linewidth=0.3,
-            zorder=3,
-        )
-        ax.add_feature(
-            cfeature.RIVERS.with_scale("50m"),
-            edgecolor="cornflowerblue",
-            alpha=0.5,
-            linewidth=0.3,
-            zorder=3,
-        )
+        ax.set_xticks([])
+        ax.set_yticks([])
 
     if title:
         ax.set_title(title)
@@ -368,55 +433,70 @@ def make_animation_comparison(
     if not (gt_frames.shape == model1_frames.shape == model2_frames.shape):
         raise ValueError("All input frame arrays must have the same shape.")
 
-    proj, img_extent = make_ccrs(meta)
-
     cmap, norm, vmin, vmax = get_cmap(img_type)
     imshow_kwargs.update({"cmap": cmap, "norm": norm, "vmin": vmin, "vmax": vmax})
-
-    fig, axs = plt.subplots(
-        1,
-        3,
-        figsize=(12, 5),
-        subplot_kw={"projection": proj},
-        gridspec_kw={"wspace": 0.05, "hspace": 0.05},
-    )
+    use_geo = _has_geo_metadata(meta)
+    if use_geo:
+        proj, img_extent = make_ccrs(meta)
+        fig, axs = plt.subplots(
+            1,
+            3,
+            figsize=(12, 5),
+            subplot_kw={"projection": proj},
+            gridspec_kw={"wspace": 0.05, "hspace": 0.05},
+        )
+    else:
+        fig, axs = plt.subplots(
+            1,
+            3,
+            figsize=(12, 5),
+            gridspec_kw={"wspace": 0.05, "hspace": 0.05},
+        )
 
     titles = [gt_title, model1_title, model2_title]
     data_sources = [gt_frames, model1_frames, model2_frames]
     ims = []
 
     for i, ax in enumerate(axs):
-        ax.set_extent(img_extent, crs=proj)
-        if cartopy_features:
-            ax.add_feature(
-                cfeature.STATES.with_scale("50m"),
-                linewidth=0.3,
-                edgecolor="black",
-                zorder=3,
-            )
-            ax.add_feature(
-                cfeature.LAKES.with_scale("50m"),
-                edgecolor="cornflowerblue",
-                alpha=0.5,
-                linewidth=0.3,
-                zorder=3,
-            )
-            ax.add_feature(
-                cfeature.RIVERS.with_scale("50m"),
-                edgecolor="cornflowerblue",
-                alpha=0.5,
-                linewidth=0.3,
-                zorder=3,
-            )
+        if use_geo:
+            ax.set_extent(img_extent, crs=proj)
+            if cartopy_features:
+                ax.add_feature(
+                    cfeature.STATES.with_scale("50m"),
+                    linewidth=0.3,
+                    edgecolor="black",
+                    zorder=3,
+                )
+                ax.add_feature(
+                    cfeature.LAKES.with_scale("50m"),
+                    edgecolor="cornflowerblue",
+                    alpha=0.5,
+                    linewidth=0.3,
+                    zorder=3,
+                )
+                ax.add_feature(
+                    cfeature.RIVERS.with_scale("50m"),
+                    edgecolor="cornflowerblue",
+                    alpha=0.5,
+                    linewidth=0.3,
+                    zorder=3,
+                )
 
-        im = ax.imshow(
-            data_sources[i][0, :, :],
-            interpolation="nearest",
-            origin="lower",
-            extent=img_extent,
-            transform=proj,
-            **imshow_kwargs,
-        )
+            im = ax.imshow(
+                data_sources[i][0, :, :],
+                interpolation="nearest",
+                origin="lower",
+                extent=img_extent,
+                transform=proj,
+                **imshow_kwargs,
+            )
+        else:
+            im = ax.imshow(
+                data_sources[i][0, :, :],
+                interpolation="nearest",
+                origin="lower",
+                **imshow_kwargs,
+            )
         ims.append(im)
         ax.set_title(titles[i])
         ax.set_xticks([])

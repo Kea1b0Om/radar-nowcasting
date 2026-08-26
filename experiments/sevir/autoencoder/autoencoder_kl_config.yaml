@@ -3,6 +3,11 @@ run_params:
   enable_wandb: true
   run_string: "autoencoder_kl"
 
+data_params:
+  dataset_name: "sevir"
+  data_key: "vil"
+  raw_seq_len: 49
+
 training_params:
   preload_model: null
   micro_batch_size: 3

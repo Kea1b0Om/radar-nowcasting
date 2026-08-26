@@ -35,32 +35,32 @@ parser.add_argument(
 parser.add_argument(
     "--preload_model",
     type=str,
-    default="saved_models/sevir/autoencoder/models/early_stopping_model.pt",
+    default=None,
     help="Path to saved autoencoder model",
 )
 parser.add_argument("--data_folder", type=str, default="sevir_full", help="Data Folder")
 parser.add_argument(
     "--train_file",
     type=str,
-    default="datasets/sevir/data/sevir_full/nowcast_training_full.h5",
+    default=None,
 )
 parser.add_argument(
     "--train_meta",
     type=str,
-    default="datasets/sevir/data/sevir_full/nowcast_training_full_META.csv",
+    default=None,
 )
 parser.add_argument(
     "--val_file",
     type=str,
-    default="datasets/sevir/data/sevir_full/nowcast_validation_full.h5",
+    default=None,
 )
 parser.add_argument(
     "--val_meta",
     type=str,
-    default="datasets/sevir/data/sevir_full/nowcast_validation_full_META.csv",
+    default=None,
 )
 parser.add_argument(
-    "--out_dir", type=str, default="datasets/sevir/data/sevir_latent_vae"
+    "--out_dir", type=str, default=None
 )
 
 args = parser.parse_args()
@@ -69,15 +69,22 @@ config = OmegaConf.load(args.config)
 model_params = config.model_params
 training_params = config.training_params
 run_params = config.run_params
+DATASET_NAME = OmegaConf.select(config, "data_params.dataset_name", default="sevir")
+DATA_KEY = OmegaConf.select(config, "data_params.data_key", default="vil")
 
 DEBUG_MODE = run_params.debug_mode
 DEBUG_PRINT_PREFIX = "[DEBUG] " if DEBUG_MODE else ""
-
-TRAIN_FILE = args.train_file
-TRAIN_META = args.train_meta
-VAL_FILE = args.val_file
-VAL_META = args.val_meta
-OUT_DIR = args.out_dir
+DEFAULT_RAW_DIR = f"datasets/{DATASET_NAME}/data/{DATASET_NAME}_full"
+DEFAULT_LATENT_DIR = f"datasets/{DATASET_NAME}/data/{DATASET_NAME}_latent_vae"
+TRAIN_FILE = args.train_file or f"{DEFAULT_RAW_DIR}/nowcast_training_full.h5"
+TRAIN_META = args.train_meta or f"{DEFAULT_RAW_DIR}/nowcast_training_full_META.csv"
+VAL_FILE = args.val_file or f"{DEFAULT_RAW_DIR}/nowcast_validation_full.h5"
+VAL_META = args.val_meta or f"{DEFAULT_RAW_DIR}/nowcast_validation_full_META.csv"
+OUT_DIR = args.out_dir or DEFAULT_LATENT_DIR
+PRELOAD_MODEL = (
+    args.preload_model
+    or f"saved_models/{DATASET_NAME}/autoencoder/models/early_stopping_model.pt"
+)
 
 OUT_TRAIN_H5 = os.path.join(OUT_DIR, "nowcast_training_full.h5")
 OUT_VAL_H5 = os.path.join(OUT_DIR, "nowcast_validation_full.h5")
@@ -88,8 +95,8 @@ OUT_VAL_META = os.path.join(OUT_DIR, "nowcast_validation_full_META.csv")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"{DEBUG_PRINT_PREFIX}Using device: {device}")
 
-if not os.path.exists(args.preload_model):
-    raise FileNotFoundError(f"Model not found at {args.preload_model}")
+if not os.path.exists(PRELOAD_MODEL):
+    raise FileNotFoundError(f"Model not found at {PRELOAD_MODEL}")
 
 
 model = AutoencoderKL(
@@ -104,7 +111,7 @@ model = AutoencoderKL(
     layers_per_block=model_params.layers_per_block,
 )
 
-checkpoint = torch.load(args.preload_model, map_location=device)
+checkpoint = torch.load(PRELOAD_MODEL, map_location=device)
 state_dict = checkpoint["model_state_dict"]
 new_state_dict = {}
 for k, v in state_dict.items():
@@ -152,6 +159,7 @@ def create_latent_h5(
     out_meta_csv,
     model,
     autoenc_type,
+    data_key,
     debug_mode=False,
 ):
     """
@@ -186,14 +194,13 @@ def create_latent_h5(
     if os.path.exists(out_h5_path):
         os.remove(out_h5_path)
 
-    dataset_name = "vil"
     with h5py.File(in_h5_path, "r") as in_h5:
-        if dataset_name not in in_h5:
+        if data_key not in in_h5:
             print(
-                f"ERROR: dataset '{dataset_name}' not found in {in_h5_path}. Skipping."
+                f"ERROR: dataset '{data_key}' not found in {in_h5_path}. Skipping."
             )
             return
-        in_data = in_h5[dataset_name]
+        in_data = in_h5[data_key]
         N, H, W, T = in_data.shape
 
         out_h5 = h5py.File(out_h5_path, "w")
@@ -229,7 +236,7 @@ def create_latent_h5(
             if dset is None:
                 h, w, t_new, c_new = latents_4d.shape
                 dset = out_h5.create_dataset(
-                    dataset_name,
+                    data_key,
                     shape=(0, h, w, t_new, c_new),
                     maxshape=(None, h, w, t_new, c_new),
                     dtype=latents_4d.dtype,
@@ -256,7 +263,7 @@ def create_latent_h5(
 
     new_meta_df = pd.DataFrame(new_meta_list)
     new_meta_df.to_csv(out_meta_csv, index=False)
-    print(f"Wrote {event_count} events to {out_h5_path} with a single dataset 'vil'.")
+    print(f"Wrote {event_count} events to {out_h5_path} with a single dataset '{data_key}'.")
     print(f"New metadata => {out_meta_csv}")
 
 
@@ -267,6 +274,7 @@ create_latent_h5(
     out_meta_csv=OUT_TRAIN_META,
     model=model,
     autoenc_type="vae",
+    data_key=DATA_KEY,
     debug_mode=DEBUG_MODE,
 )
 
@@ -277,7 +285,8 @@ create_latent_h5(
     out_meta_csv=OUT_VAL_META,
     model=model,
     autoenc_type="vae",
+    data_key=DATA_KEY,
     debug_mode=DEBUG_MODE,
 )
 
-print("Done generating 'vil' latent-only HDF5 files for train & validation.")
+print(f"Done generating '{DATA_KEY}' latent-only HDF5 files for {DATASET_NAME} train & validation.")

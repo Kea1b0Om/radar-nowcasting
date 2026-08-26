@@ -1,0 +1,140 @@
+# UOT-only, trained FROM SCRATCH with the ORIGINAL CIKM recipe.
+# Identical to the original flowcast_config.yaml (batch 3, 200 epochs,
+# patience 50, 5e-4 cosine, fp16, random init) so the comparison against
+# the existing from-scratch baseline is recipe-matched; the ONLY
+# scientific difference is uot_params.enabled.
+stdit:
+  hidden_size: 1024
+  depth: 12
+  num_heads: 8
+  patch_size: [1, 2, 2]
+  mlp_ratio: 4.0
+  drop_path: 0.0
+  qk_norm: true
+
+rflow_params:
+  num_train_timesteps: 1000
+
+sampling_params:
+  euler_steps: 10
+
+training_params:
+  micro_batch_size: 3
+  num_epochs: 200
+  num_workers: 12
+  early_stopping_patience: 50
+  early_stopping_metric: "partial_csi_m"
+  grad_accumulation_steps: 1
+  gradient_clip_val: 1.0
+  fp16: true
+  save_latest_every_batches: 400
+
+optimizer_params:
+  learning_rate: 0.0005
+  optimizer_type: "adamw"
+  weight_decay: 0.0001
+
+scheduler_params:
+  scheduler_type: "cosine"
+  lr_plateau_factor: 0.2
+  lr_plateau_patience: 6
+  lr_cosine_warmup_iter_percentage: 0.01
+  lr_cosine_min_warmup_lr_ratio: 0.1
+  lr_cosine_min_lr_ratio: 0.01
+
+data_params:
+  dataset_name: "cikm"
+  data_key: "vil"
+  raw_seq_len: 15
+  input_length: 5
+  output_length: 10
+  lag_time: 5
+  lead_time: 10
+  time_spacing: 1
+  stride: 1
+
+evaluation_params:
+  pixel_scale: 90.0
+  thresholds: [20, 30, 35, 40]
+
+run_params:
+  debug_mode: false
+  enable_wandb: true
+  run_string: "uot_v3_cikm"
+  preload_model: null
+  # crash resume keeps model+optimizer+LR-schedule position consistent
+  resume_latest_path: "artifacts/cikm/flowcast/uot_scratch_latest.pt"
+
+partial_evaluation_params:
+  partial_evaluation: true
+  partial_evaluation_interval: 1
+  partial_evaluation_batches: 40
+  cartopy_features: false
+
+autoencoder_params:
+  autoencoder_checkpoint: "${DATA_ROOT}/artifacts/cikm/autoencoder_kl/2026-04-12_22-46-18_autoencoder_kl_ready-gamboge-civet/models/early_stopping_model.pt"
+  normalized_autoencoder: true
+  latent_channels: 4
+  norm_num_groups: 32
+  layers_per_block: 2
+  act_fn: "silu"
+  block_out_channels: [128, 256, 512, 512]
+  down_block_types:
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+  up_block_types:
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+
+ema_model_saving_params:
+  ema_model_saving: true
+  ema_model_saving_decay: 0.999
+
+test_params:
+  micro_batch_size: 6
+  num_workers: 12
+  probabilistic_samples: 8
+  batch_size_autoencoder: 12
+  euler_steps: 10
+  cartopy_features: false
+
+# --- the ONLY scientific delta vs the original recipe ---
+# v2 (post-audit): zero-anchored mass (no background carpet), fixed
+# climatological value scale instead of per-sample normalization,
+# dry-frame mass penalty, t_power 1, blur >= pooled grid spacing,
+# warmup ramp on the UOT weight.
+uot_params:
+  enabled: true
+  weight: 0.0005
+  t_power: 1.0
+  # legacy per-sample normalization OFF: it equalizes drizzle and extreme
+  # events, erasing the mass signal (Francis-style fixed M_ref instead)
+  normalize_by_mass: false
+  # fixed M_ref divisor; calibrated so uot_term/training_loss ~ 10%
+  # (measured empirically before launch - see calibration script)
+  value_scale_ref: 227.2
+  # true-frame mass below this = "dry": penalize predicted mass directly
+  # instead of running Sinkhorn against an empty target
+  dry_frame_mass: 0.001
+  # linear ramp of the UOT weight over the first steps (global_step units;
+  # 5334 = ~2 epochs at batch 3 x 889 batches)
+  warmup_steps: 5334
+  blur: 4.0
+  reach: 16.0
+  downsample: 4
+  n_iters: 100
+  self_iters: 50
+  mass_transform: "zr_dbz"
+  mass_low_threshold: 0.5
+  threshold_mode: "soft"
+  threshold_softness: 1.0
+  # raw-field value meaning "no echo" (dBZ): anchors the soft threshold so
+  # a zero pixel carries EXACTLY zero mass - kills the ~800-unit fake
+  # background/padding mass carpet that dwarfed real storm mass (~117)
+  mass_zero_point: 0.0
+  mass_gamma: 1.0
+  mass_scale: 10.0

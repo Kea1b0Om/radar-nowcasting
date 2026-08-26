@@ -1,50 +1,17 @@
-latent_model:
-  base_units: 192
-  scale_alpha: 1.0
-  num_heads: 4
-  attn_drop: 0.1
-  proj_drop: 0.1
-  ffn_drop: 0.1
-  # inter-attn downsample/upsample
-  downsample: 2
-  downsample_type: "patch_merge"
-  upsample_type: "upsample"
-  upsample_kernel_size: 3
-  # cuboid attention
-  depth: [4, 4]
-  self_pattern: "axial"
-  # global vectors
-  num_global_vectors: 0
-  use_dec_self_global: false
-  dec_self_update_global: true
-  use_dec_cross_global: false
-  use_global_vector_ffn: false
-  use_global_self_attn: true
-  separate_global_qkv: true
-  global_dim_ratio: 1
-  # mise
-  ffn_activation: "gelu"
-  gated_ffn: false
-  norm_layer: "layer_norm"
-  padding_type: "zeros"
-  pos_embed_type: "t+h+w"
-  checkpoint_level: 0
-  use_relative_pos: true
-  self_attn_use_final_proj: true
-  # initialization
-  attn_linear_init_mode: "0"
-  ffn_linear_init_mode: "0"
-  ffn2_linear_init_mode: "2"
-  attn_proj_linear_init_mode: "2"
-  conv_init_mode: "0"
-  down_up_linear_init_mode: "0"
-  global_proj_linear_init_mode: "2"
-  norm_init_mode: "0"
-  # timestep embedding
-  time_embed_channels_mult: 4
-  time_embed_use_scale_shift_norm: false
-  time_embed_dropout: 0.0
-  unet_res_connect: True
+stdit:
+  hidden_size: 1024
+  depth: 12
+  num_heads: 8
+  patch_size: [1, 2, 2]
+  mlp_ratio: 4.0
+  drop_path: 0.0
+  qk_norm: true
+
+rflow_params:
+  num_train_timesteps: 1000
+
+sampling_params:
+  euler_steps: 10
 
 training_params:
   micro_batch_size: 3
@@ -70,19 +37,25 @@ scheduler_params:
   lr_cosine_min_lr_ratio: 0.01
 
 data_params:
-  lag_time: 13
+  dataset_name: "sevir"
+  data_key: "vil"
+  raw_seq_len: 49
+  input_length: 6
+  output_length: 12
+  lag_time: 6
   lead_time: 12
   time_spacing: 1
+  stride: 12
+
+evaluation_params:
+  pixel_scale: 255.0
+  thresholds: [16, 74, 133, 160, 181, 219]
 
 run_params:
   debug_mode: false
   enable_wandb: true
-  run_string: "cfm_flowcast_ddp"
+  run_string: "rf_stdit_ddp"
   preload_model: null
-
-flow_matching_params:
-  flow_matching_method: "vanilla"
-  sigma: 0.01
 
 partial_evaluation_params:
   partial_evaluation: true

@@ -1,0 +1,220 @@
+# ============================================================================
+# RMLF arm R1: detached self forcing
+#
+# MATCHED CONTINUATION.  Every arm in this family is byte-identical to
+# flowcast_config_uot_v4_clean.yaml -- same UOT recipe, same optimizer, same
+# scheduler, same data -- except for `rmlf_params` and the two identity fields
+# (`run_string`, `resume_latest_path`).  Any other difference between arms
+# makes the R0/R1/R2/R3 comparison uninterpretable.
+#
+# All four arms continue from the SAME immutable parent checkpoint for the
+# SAME number of epochs.  R0 must be re-run rather than reusing an older
+# number, because continuation on its own moves the metric.
+#
+# Before launching, replace every PARENT_* placeholder below:
+#   PARENT_CHECKPOINT_ABSOLUTE_PATH -> the shared parent .pt
+#   PARENT_EPOCH_PLUS_14            -> parent['epoch'] + 1 + 13
+#   PARENT_GLOBAL_STEP              -> parent['global_step']
+# and record the parent's sha256, epoch, global_step and git commit
+# alongside the run.  run_rmlf_arm.sh refuses to launch until they are
+# all replaced.
+# ============================================================================
+
+stdit:
+  hidden_size: 1024
+  depth: 12
+  num_heads: 8
+  patch_size: [1, 2, 2]
+  mlp_ratio: 4.0
+  drop_path: 0.0
+  qk_norm: true
+
+rflow_params:
+  num_train_timesteps: 1000
+
+sampling_params:
+  euler_steps: 10
+
+training_params:
+  micro_batch_size: 3
+  # UNCHANGED full schedule.  `total_num_steps = num_epochs * batches` drives
+  # the cosine T_max and the warmup length, so shortening this would change
+  # the LR trajectory -- exactly the confound a matched continuation avoids.
+  num_epochs: 200
+  # The continuation budget is an ABSOLUTE stop instead, because the epoch
+  # loop is `range(parent_epoch + 1, end)`.  Writing `num_epochs: 13` against
+  # a parent at epoch 128 gives `range(129, 13)` -- zero epochs trained.
+  #
+  #   continuation_end_epoch_exclusive = PARENT_EPOCH + 1 + 13
+  #
+  # Identical in all four arms.  It is absolute rather than relative on
+  # purpose: after a restart `start_epoch` becomes this arm's own latest
+  # epoch, so a relative budget would re-grant the full 13 epochs each crash.
+  # The trainer records it in the resume checkpoint and refuses to continue if
+  # the config later disagrees.
+  continuation_end_epoch_exclusive: PARENT_EPOCH_PLUS_14
+  num_workers: 12
+  # Longer than num_epochs on purpose: a matched continuation must run its
+  # full budget in every arm, otherwise the arms differ in training length.
+  early_stopping_patience: 100
+  early_stopping_metric: "partial_csi_m"
+  grad_accumulation_steps: 1
+  gradient_clip_val: 1.0
+  fp16: true
+  save_latest_every_batches: 400
+  # One snapshot per epoch so the checkpoint can be picked offline under the
+  # frozen rule (tools/select_checkpoint.py) instead of by a noisy
+  # single-file early-stopping write.
+  snapshot_every_epochs: 1
+  # Carry the evaluation EMA across supervisor restarts; without it a crash
+  # silently reinitializes it and partial_csi_m stops being comparable.
+  save_ema_in_latest: true
+
+optimizer_params:
+  learning_rate: 0.0005
+  optimizer_type: "adamw"
+  weight_decay: 0.0001
+
+scheduler_params:
+  scheduler_type: "cosine"
+  lr_plateau_factor: 0.2
+  lr_plateau_patience: 6
+  lr_cosine_warmup_iter_percentage: 0.01
+  lr_cosine_min_warmup_lr_ratio: 0.1
+  lr_cosine_min_lr_ratio: 0.01
+
+data_params:
+  dataset_name: "cikm"
+  data_key: "vil"
+  raw_seq_len: 15
+  input_length: 5
+  output_length: 10
+  lag_time: 5
+  lead_time: 10
+  time_spacing: 1
+  stride: 1
+
+evaluation_params:
+  pixel_scale: 90.0
+  thresholds: [20, 30, 35, 40]
+
+run_params:
+  debug_mode: false
+  enable_wandb: true
+  run_string: "rmlf_r1_cikm"
+  # MATCHED CONTINUATION parent.  Identical across R0/R1/R2/R3, and it must
+  # carry optimizer + scheduler + epoch/global_step so every arm resumes the
+  # same trajectory rather than restarting one.
+  preload_model: "PARENT_CHECKPOINT_ABSOLUTE_PATH"
+  resume_latest_path: "artifacts/cikm/flowcast/rmlf_r1_latest.pt"
+
+partial_evaluation_params:
+  partial_evaluation: true
+  partial_evaluation_interval: 1
+  # UNCHANGED from the master config, on purpose.  The CIKM val split is
+  # 2000 sequences and the partial loader uses
+  # `BATCH_SIZE // 4 if BATCH_SIZE > 4 else BATCH_SIZE` = 3 (micro_batch_size
+  # is 3), so 40 batches score the first 120 events -- 6% of validation,
+  # always the same 120 since shuffle=False.
+  #
+  # That is thin for picking a checkpoint WITHIN an arm, but it is the same
+  # 120 events with the same PARTIAL_EVAL_SEED noise draw in every arm, so
+  # arm-vs-arm comparison stays paired, and it keeps these runs on the same
+  # ruler as every existing CIKM number.  Raising it to ceil(2000/3)=667 is a
+  # defensible change -- it costs ~17x the partial-eval compute per epoch and
+  # makes partial_csi_m incomparable to earlier runs, so make it deliberately
+  # and for all four arms at once, not as a side effect.
+  partial_evaluation_batches: 40
+  cartopy_features: false
+
+autoencoder_params:
+  autoencoder_checkpoint: "${DATA_ROOT}/artifacts/cikm/autoencoder_kl/2026-04-12_22-46-18_autoencoder_kl_ready-gamboge-civet/models/early_stopping_model.pt"
+  normalized_autoencoder: true
+  latent_channels: 4
+  norm_num_groups: 32
+  layers_per_block: 2
+  act_fn: "silu"
+  block_out_channels: [128, 256, 512, 512]
+  down_block_types:
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+  up_block_types:
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+
+ema_model_saving_params:
+  ema_model_saving: true
+  ema_model_saving_decay: 0.999
+
+test_params:
+  micro_batch_size: 6
+  num_workers: 12
+  probabilistic_samples: 8
+  batch_size_autoencoder: 12
+  euler_steps: 10
+  cartopy_features: false
+
+# The only scientific delta from the original FlowCast-STDiT recipe.
+uot_params:
+  enabled: true
+  weight: 0.0005
+  t_power: 1.0
+  normalize_by_mass: false
+  value_scale_ref: 227.2
+  dry_frame_mass: 0.001
+  # UOT weight ramps from zero to 0.0005 over the first ~2 epochs.
+  warmup_steps: 5334
+  blur: 4.0
+  reach: 16.0
+  downsample: 4
+  n_iters: 100
+  self_iters: 50
+  mass_transform: "zr_dbz"
+  mass_low_threshold: 0.5
+  threshold_mode: "soft"
+  threshold_softness: 1.0
+  mass_zero_point: 0.0
+  mass_gamma: 1.0
+  mass_scale: 10.0
+
+# ---------------------------------------------------------------------------
+# R1: detached self forcing.  The previous chunk is generated from pure noise
+# by the frozen teacher using the DEPLOYMENT solver, so chunk 2 is trained on
+# exactly the condition it meets at test time.  This arm deliberately keeps
+# self forcing's known weakness -- a freely sampled first chunk may pick a
+# different weather mode than the single observed second chunk.
+# ---------------------------------------------------------------------------
+rmlf_params:
+  enabled: true
+  condition_mode: "self_forcing"
+  rollout_probability: 0.50
+  # ~2 continuation epochs at micro_batch_size 3.  The ramp is measured from
+  # `warmup_start_global_step`, NOT from zero: a continuation restores the
+  # parent's global_step (order 1e5), so a zero-anchored ramp would already be
+  # saturated on the very first batch and this warmup would do nothing.
+  # Must equal the parent checkpoint's `global_step`; the trainer asserts it.
+  warmup_steps: 5334
+  warmup_start_global_step: PARENT_GLOBAL_STEP
+  # Ignored by self_forcing: the previous chunk starts from pure noise.
+  corruption_min: 1.0
+  corruption_max: 1.0
+  # MUST equal sampling_params.euler_steps.  A cheaper bridge would inject
+  # solver error that has nothing to do with rollout conditioning and would
+  # make R2 beat R1 for the wrong reason.
+  bridge_euler_steps: 10
+  mix_granularity: "batch"
+  max_relative_l2: null
+  relative_l2_floor: 0.10
+
+  coupling_mode: "independent"
+  lead_power: 0.0
+  amplification_table: null
+  random_seed: 314159
+
+  teacher_mode: "frozen"
+  teacher_checkpoint: "PARENT_CHECKPOINT_ABSOLUTE_PATH"
+  teacher_checkpoint_type: "raw"

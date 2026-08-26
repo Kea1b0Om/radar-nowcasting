@@ -1,0 +1,10 @@
+This repository is a modified fork of FlowCast
+(https://github.com/b-rbmp/FlowCast), licensed under the Apache License 2.0.
+
+Modifications in this fork include, among others:
+  - an alternative STDiT-based denoiser and chunked autoregressive sampler
+  - unbalanced optimal transport and quantile-weighted training objectives
+  - additional datasets (CIKM2017, Shanghai2020, MeteoNet) and their loaders
+  - evaluation, calibration and diagnostic tooling under tools/
+
+The original Apache 2.0 LICENSE is retained unchanged.

@@ -1,0 +1,61 @@
+# SimVP calibration baseline on CIKM.
+#
+# Purpose: this run exists ONLY to check whether our data + evaluation pipeline
+# sits on the same scale as the published CIKM tables.  SDIR (arXiv 2606.02661,
+# Table 1) reports SimVP CSI-M = 0.3047 and DuoCast (arXiv 2412.01091, Table 2)
+# reports 0.3052 under the same documented protocol (101x101 zero-padded to
+# 128x128, 5 -> 10 frames, thresholds 20/30/35/40, split 8000/2000/4000).
+#
+# Every data_params / evaluation_params entry below is copied verbatim from
+# flowcast_config_uot_v4_clean.yaml so the two runs are evaluated identically.
+
+simvp:
+  hid_S: 64
+  hid_T: 256
+  N_T: 6
+  N_S: 2
+  spatio_kernel_enc: 3
+  spatio_kernel_dec: 3
+
+training_params:
+  micro_batch_size: 16
+  num_epochs: 100
+  num_workers: 8
+  early_stopping_patience: 20
+  early_stopping_metric: "val_csi_m"
+  gradient_clip_val: 1.0
+
+optimizer_params:
+  learning_rate: 0.001
+  optimizer_type: "adam"
+  weight_decay: 0.0
+
+scheduler_params:
+  scheduler_type: "onecycle"
+
+data_params:
+  dataset_name: "cikm"
+  data_key: "vil"
+  raw_seq_len: 15
+  input_length: 5
+  output_length: 10
+  lag_time: 5
+  lead_time: 10
+  time_spacing: 1
+  stride: 1
+
+evaluation_params:
+  pixel_scale: 90.0
+  thresholds: [20, 30, 35, 40]
+
+run_params:
+  debug_mode: false
+  enable_wandb: false
+  run_string: "simvp_calib_cikm"
+  seed: 0
+  resume_latest_path: "artifacts/cikm/simvp/simvp_calib_latest.pt"
+  best_model_path: "artifacts/cikm/simvp/simvp_calib_best.pt"
+
+test_params:
+  micro_batch_size: 16
+  num_workers: 8

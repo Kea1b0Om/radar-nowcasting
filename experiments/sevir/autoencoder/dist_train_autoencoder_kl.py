@@ -1,6 +1,6 @@
 """
 Distributed training script for a Variational Autoencoder (VAE) with a GAN-style
-discriminator on the SEVIR dataset.
+discriminator on standardized nowcasting datasets.
 """
 
 import sys
@@ -12,7 +12,10 @@ os.environ["HDF5_USE_FILE_LOCKING"] = "FALSE"
 import datetime
 import numpy as np
 import wandb
-import namegenerator
+try:
+    import namegenerator
+except Exception:  # optional: only used to make a random run name
+    namegenerator = None
 from matplotlib import pyplot as plt
 from omegaconf import OmegaConf
 
@@ -34,7 +37,26 @@ from experiments.sevir.dataset.sevirfulldataset_autoencoder import (
 )
 from diffusers.models.autoencoders import AutoencoderKL
 from common.autoencoder.utils.early_stopping import EarlyStopping
-from experiments.sevir.display.cartopy import plot_pair_frames
+try:
+    from experiments.sevir.display.cartopy import plot_pair_frames
+except Exception as _plot_exc:  # cartopy optional: geo features are unused off SEVIR
+    print(f"[warn] cartopy unavailable ({_plot_exc}); using plain reconstruction plots.")
+
+    def plot_pair_frames(
+        frame1, frame2, meta1=None, meta2=None, title=None,
+        title_frame1="Frame 1", title_frame2="Frame 2", **kwargs
+    ):
+        fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+        for ax, frame, subtitle in zip(axes, (frame1, frame2), (title_frame1, title_frame2)):
+            image = ax.imshow(frame, cmap="turbo", vmin=0, vmax=255)
+            ax.set_title(subtitle)
+            ax.axis("off")
+            fig.colorbar(image, ax=ax, fraction=0.046)
+        if title is not None:
+            fig.suptitle(title)
+        fig.tight_layout()
+        return fig
+
 import argparse
 
 
@@ -102,37 +124,34 @@ parser.add_argument(
 parser.add_argument(
     "--train_file",
     type=str,
-    default="datasets/sevir/data/sevir_full/nowcast_training_full.h5",
+    default=None,
 )
 parser.add_argument(
     "--train_meta",
     type=str,
-    default="datasets/sevir/data/sevir_full/nowcast_training_full_META.csv",
+    default=None,
 )
 parser.add_argument(
     "--val_file",
     type=str,
-    default="datasets/sevir/data/sevir_full/nowcast_validation_full.h5",
+    default=None,
 )
 parser.add_argument(
     "--val_meta",
     type=str,
-    default="datasets/sevir/data/sevir_full/nowcast_validation_full_META.csv",
+    default=None,
 )
 
 args = parser.parse_args()
 
 config = OmegaConf.load(args.config)
 run_params = config.run_params
+data_params = config.data_params
 training_params = config.training_params
 optimizer_params = config.optimizer_params
 scheduler_params = config.scheduler_params
 model_params = config.model_params
 loss_params = config.loss_params
-TRAIN_FILE = args.train_file
-TRAIN_META = args.train_meta
-VAL_FILE = args.val_file
-VAL_META = args.val_meta
 
 DEBUG_MODE = run_params.debug_mode
 RUN_STRING = run_params.run_string
@@ -142,7 +161,9 @@ run_id_timestamp_string = (
 )
 random_name_part_list = [None]
 if rank == 0:
-    random_name_part_list[0] = namegenerator.gen()
+    random_name_part_list[0] = (
+        namegenerator.gen() if namegenerator is not None else os.urandom(3).hex()
+    )
 
 if world_size > 1:
     dist.broadcast_object_list(random_name_part_list, src=0)
@@ -151,7 +172,9 @@ if random_name_part is None and rank != 0:
     print(
         f"[WARNING] Rank {rank} did not receive random_name_part, generating locally. RUN_ID might be inconsistent."
     )
-    random_name_part = namegenerator.gen()
+    random_name_part = (
+        namegenerator.gen() if namegenerator is not None else os.urandom(3).hex()
+    )
 
 
 RUN_ID = run_id_timestamp_string + "_" + random_name_part
@@ -159,6 +182,14 @@ RUN_ID = run_id_timestamp_string + "_" + random_name_part
 DEBUG_PRINT_PREFIX = f"[DEBUG Rank {rank}] " if DEBUG_MODE else f"[Rank {rank}] "
 
 ENABLE_WANDB = run_params.enable_wandb
+DATASET_NAME = OmegaConf.select(config, "data_params.dataset_name", default="sevir")
+DATA_KEY = OmegaConf.select(config, "data_params.data_key", default="vil")
+RAW_SEQ_LEN = OmegaConf.select(config, "data_params.raw_seq_len", default=49)
+DEFAULT_RAW_DIR = f"datasets/{DATASET_NAME}/data/{DATASET_NAME}_full"
+TRAIN_FILE = args.train_file or f"{DEFAULT_RAW_DIR}/nowcast_training_full.h5"
+TRAIN_META = args.train_meta or f"{DEFAULT_RAW_DIR}/nowcast_training_full_META.csv"
+VAL_FILE = args.val_file or f"{DEFAULT_RAW_DIR}/nowcast_validation_full.h5"
+VAL_META = args.val_meta or f"{DEFAULT_RAW_DIR}/nowcast_validation_full_META.csv"
 
 NORMALIZE_DATASET = training_params.normalize_dataset
 PRELOAD_MODEL = training_params.preload_model
@@ -233,12 +264,12 @@ if ENABLE_WANDB and rank == 0:
     primitive_config = OmegaConf.to_container(config, resolve=True)
     flat_config = flatten_dict(primitive_config)
     wandb.init(
-        project="sevir-nowcasting",
+        project=f"{DATASET_NAME}-nowcasting",
         config=flat_config,
         name=RUN_ID,
     )
 
-ARTIFACTS_FOLDER = "artifacts/sevir/autoencoder_kl/" + RUN_ID
+ARTIFACTS_FOLDER = f"artifacts/{DATASET_NAME}/autoencoder_kl/{RUN_ID}"
 PLOTS_FOLDER = ARTIFACTS_FOLDER + "/plots"
 ANIMATIONS_FOLDER = PLOTS_FOLDER + "/animations"
 METRICS_FOLDER = PLOTS_FOLDER + "/metrics"
@@ -260,8 +291,8 @@ else:
 train_dataset = DynamicAutoencoderSevirDataset(
     meta_csv=TRAIN_META,
     data_file=TRAIN_FILE,
-    data_type="vil",
-    raw_seq_len=49,
+    data_type=DATA_KEY,
+    raw_seq_len=RAW_SEQ_LEN,
     channel_last=False,
     debug_mode=DEBUG_MODE,
     normalize=NORMALIZE_DATASET,
@@ -269,8 +300,8 @@ train_dataset = DynamicAutoencoderSevirDataset(
 val_dataset = DynamicAutoencoderSevirDataset(
     meta_csv=VAL_META,
     data_file=VAL_FILE,
-    data_type="vil",
-    raw_seq_len=49,
+    data_type=DATA_KEY,
+    raw_seq_len=RAW_SEQ_LEN,
     channel_last=False,
     debug_mode=DEBUG_MODE,
     normalize=NORMALIZE_DATASET,
@@ -744,6 +775,21 @@ def validate(
                     epoch,
                     global_step,
                 )
+    elif WARMUP_GENERATOR_EPOCHS >= NUM_EPOCHS:
+        # Pure-reconstruction mode (warmup >= num_epochs disables the GAN, as
+        # for Shanghai where the discriminator diverged): the gen val loss
+        # scale is consistent from epoch 0, so track/save from the start.
+        # Without this branch such a run trains to completion and saves
+        # NOTHING -- the tracking above is reachable only after activation.
+        if rank == 0:
+            early_stopping(
+                avg_gen_loss,
+                model,
+                gen_optimizer,
+                disc_optimizer,
+                epoch,
+                global_step,
+            )
 
     return avg_total_loss, avg_gen_loss, avg_disc_loss
 

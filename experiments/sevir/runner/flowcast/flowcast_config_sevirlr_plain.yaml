@@ -1,0 +1,125 @@
+# SEVIR-LR baseline (no UOT) -- the control arm for the SEVIR-LR UOT run.
+#
+# Data: PW-FouCast's SEVIR-LR sequences, converted to our HDF5 layout by
+# datasets/sevir/sevirlr_npy_to_h5.py. 128x128, 25 frames, temporal split
+# train 2018-01-08..2019-04-08 / val 2019-04-08..2019-05-31 /
+# test 2019-06-01..2019-11-30 (9698 / 1078 / 4053 sequences).
+#
+# Protocol is 5 -> 20, matching AlphaPre (CVPR'25), DuoCast (AAAI'26) and SDIR
+# on SEVIR, so the numbers land on the same scale as their published tables.
+# 25 frames = 5 + 20 exactly, and 20 % 5 == 0 satisfies the autoregressive
+# sampler's divisibility constraint.
+
+stdit:
+  hidden_size: 1024
+  depth: 12
+  num_heads: 8
+  patch_size: [1, 2, 2]
+  mlp_ratio: 4.0
+  drop_path: 0.0
+  qk_norm: true
+
+rflow_params:
+  num_train_timesteps: 1000
+
+sampling_params:
+  euler_steps: 10
+
+training_params:
+  # 3-GPU DDP, run AFTER the UOT arm (both arms need all three cards, so the
+  # twins run sequentially, not in parallel). micro 2 x accum 1 x world 3 =
+  # effective batch 6; micro 2 is the largest per-card size at which the UOT
+  # arm's 40 grad-retaining pixel decodes fit (measured 30.1 GB / 48 GB).
+  # These values and the world_size MUST equal the UOT arm's exactly --
+  # DistributedSampler partitions by world_size and randn shapes follow the
+  # micro batch, so any mismatch breaks the matched-seed pairing.
+  micro_batch_size: 2
+  grad_accumulation_steps: 1
+  num_epochs: 200
+  num_workers: 12
+  early_stopping_patience: 50
+  early_stopping_metric: "partial_csi_m"
+  gradient_clip_val: 1.0
+  fp16: true
+  save_latest_every_batches: 400
+
+optimizer_params:
+  learning_rate: 0.0005
+  optimizer_type: "adamw"
+  weight_decay: 0.0001
+
+scheduler_params:
+  scheduler_type: "cosine"
+  lr_plateau_factor: 0.2
+  lr_plateau_patience: 6
+  lr_cosine_warmup_iter_percentage: 0.01
+  lr_cosine_min_warmup_lr_ratio: 0.1
+  lr_cosine_min_lr_ratio: 0.01
+
+data_params:
+  dataset_name: "sevir"
+  data_key: "vil"
+  raw_seq_len: 25
+  input_length: 5
+  output_length: 20
+  lag_time: 5
+  lead_time: 20
+  time_spacing: 1
+  # 25 == lag + lead, so exactly one window per event whatever the stride.
+  stride: 25
+
+evaluation_params:
+  pixel_scale: 255.0
+  thresholds: [16, 74, 133, 160, 181, 219]
+
+run_params:
+  debug_mode: false
+  enable_wandb: false
+  run_string: "sevirlr_plain"
+  preload_model: null
+  resume_latest_path: "artifacts/sevir_lr/flowcast/sevirlr_plain_latest.pt"
+
+partial_evaluation_params:
+  partial_evaluation: true
+  partial_evaluation_interval: 1
+  partial_evaluation_batches: 40
+  cartopy_features: false
+
+autoencoder_params:
+  # Reused from the earlier 49-frame SEVIR work. It is a fully convolutional
+  # AutoencoderKL trained on SEVIR VIL in the same 0-255 value range, so it is
+  # resolution-agnostic and should transfer to the 128x128 LR frames -- but
+  # that is an assumption until tools/eval_ae_oracle.py confirms the
+  # reconstruction ceiling on THIS split.
+  autoencoder_checkpoint: "${DATA_ROOT}/saved_models/sevir/autoencoder/models/early_stopping_model.pt"
+  normalized_autoencoder: true
+  latent_channels: 4
+  norm_num_groups: 32
+  layers_per_block: 2
+  act_fn: "silu"
+  block_out_channels: [128, 256, 512, 512]
+  down_block_types:
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+  up_block_types:
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+
+ema_model_saving_params:
+  ema_model_saving: true
+  ema_model_saving_decay: 0.999
+
+test_params:
+  micro_batch_size: 6
+  num_workers: 12
+  probabilistic_samples: 1
+  batch_size_autoencoder: 12
+  euler_steps: 10
+  cartopy_features: false
+
+uot_params:
+  enabled: false

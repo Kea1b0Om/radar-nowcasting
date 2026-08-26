@@ -1,0 +1,128 @@
+# CIKM production config for Innovation 2 ONLY: the plain FlowCast-STDiT
+# objective augmented with a field-wise unbalanced Sinkhorn (UOT) loss.
+# Identical to flowcast_config.yaml except: uot_params added, warm start
+# from the trained CIKM baseline (same init as the baseline -> the run is
+# a clean baseline-vs-baseline+UOT comparison), fine-tune schedule, and
+# crash-resilience (periodic latest checkpoint + auto-resume).
+
+stdit:
+  hidden_size: 1024
+  depth: 12
+  num_heads: 8
+  patch_size: [1, 2, 2]
+  mlp_ratio: 4.0
+  drop_path: 0.0
+  qk_norm: true
+
+rflow_params:
+  num_train_timesteps: 1000
+
+sampling_params:
+  euler_steps: 10
+
+training_params:
+  micro_batch_size: 3
+  num_epochs: 25
+  num_workers: 12
+  early_stopping_patience: 5
+  early_stopping_metric: "partial_csi_m"
+  grad_accumulation_steps: 1
+  gradient_clip_val: 1.0
+  fp16: true
+  save_latest_every_batches: 400
+
+optimizer_params:
+  learning_rate: 0.0005
+  optimizer_type: "adamw"
+  weight_decay: 0.0001
+
+scheduler_params:
+  scheduler_type: "cosine"
+  lr_plateau_factor: 0.2
+  lr_plateau_patience: 6
+  lr_cosine_warmup_iter_percentage: 0.01
+  lr_cosine_min_warmup_lr_ratio: 0.1
+  lr_cosine_min_lr_ratio: 0.01
+
+data_params:
+  dataset_name: "cikm"
+  data_key: "vil"
+  raw_seq_len: 15
+  input_length: 5
+  output_length: 10
+  lag_time: 5
+  lead_time: 10
+  time_spacing: 1
+  stride: 1
+
+evaluation_params:
+  pixel_scale: 90.0
+  thresholds: [20, 30, 35, 40]
+
+run_params:
+  debug_mode: false
+  enable_wandb: true
+  run_string: "uot_only_cikm"
+  # trained CIKM baseline weights (mean/std kept, optimizer/step stripped)
+  preload_model: "${DATA_ROOT}/saved_models/cikm/flowcast_warmstart_stdit.pt"
+  resume_latest_path: "artifacts/cikm/flowcast/uot_only_latest.pt"
+
+partial_evaluation_params:
+  partial_evaluation: true
+  partial_evaluation_interval: 1
+  partial_evaluation_batches: 40
+  cartopy_features: false
+
+autoencoder_params:
+  autoencoder_checkpoint: "${DATA_ROOT}/artifacts/cikm/autoencoder_kl/2026-04-12_22-46-18_autoencoder_kl_ready-gamboge-civet/models/early_stopping_model.pt"
+  normalized_autoencoder: true
+  latent_channels: 4
+  norm_num_groups: 32
+  layers_per_block: 2
+  act_fn: "silu"
+  block_out_channels: [128, 256, 512, 512]
+  down_block_types:
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+  up_block_types:
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+
+ema_model_saving_params:
+  ema_model_saving: true
+  ema_model_saving_decay: 0.999
+
+test_params:
+  micro_batch_size: 6
+  num_workers: 12
+  probabilistic_samples: 8
+  batch_size_autoencoder: 12
+  euler_steps: 10
+  cartopy_features: false
+
+# --- Innovation 2: field-wise unbalanced Sinkhorn training loss ---
+# Transport prices displacement smoothly (no pointwise double penalty),
+# the marginal relaxation prices creation/destruction of precipitation
+# mass. blur/reach in original pixel units. CIKM is radar reflectivity in
+# dBZ (eval scale 0-90): transport mass is linear rain rate via
+# Marshall-Palmer, NOT logarithmic dBZ; low_threshold/softness are mm/h.
+uot_params:
+  enabled: true
+  weight: 0.01
+  t_power: 2.0
+  normalize_by_mass: true
+  blur: 3.0
+  reach: 16.0
+  downsample: 4
+  n_iters: 100
+  self_iters: 50
+  mass_transform: "zr_dbz"
+  mass_low_threshold: 0.5
+  threshold_mode: "soft"
+  threshold_softness: 1.0
+  mass_gamma: 1.0
+  mass_scale: 10.0

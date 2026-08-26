@@ -109,3 +109,6 @@ def sequential_collate(batch):
     frame = np.stack(frame, axis=0)
     frame = torch.from_numpy(frame).float()
     return frame, list(row)
+
+
+DynamicAutoencoderNowcastDataset = DynamicAutoencoderSevirDataset

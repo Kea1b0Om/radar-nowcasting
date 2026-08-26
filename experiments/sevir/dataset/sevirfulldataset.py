@@ -337,3 +337,10 @@ def dynamic_encoded_sequential_collate(batch):
     X = torch.stack(X_list, dim=0)
     Y = torch.stack(Y_list, dim=0)
     return X, Y, list(meta_list)
+
+
+# Generic aliases for non-SEVIR nowcasting datasets that follow the same HDF5 schema.
+DynamicSequentialNowcastDataset = DynamicSequentialSevirDataset
+DynamicEncodedSequentialNowcastDataset = DynamicEncodedSequentialSevirDataset
+dynamic_nowcast_collate = dynamic_sequential_collate
+dynamic_encoded_nowcast_collate = dynamic_encoded_sequential_collate

@@ -1,0 +1,147 @@
+# SEVIR-LR + UOT -- the treatment arm.
+#
+# Identical to flowcast_config_sevirlr_plain.yaml except for run_string,
+# resume path and uot_params. Because dist_train_flowcast.py hard-codes
+# seed = 42 (line 655) and seeds the DistributedSampler with it, and because
+# rflow_training_loss draws `noise` and `t` BEFORE the UOT branch while the
+# Sinkhorn solver consumes no RNG, these two runs share initialization, data
+# order and noise stream exactly. The only difference is UOT's gradient
+# contribution -- i.e. a genuine matched-seed twin, which is what the CIKM
+# work never had.
+
+stdit:
+  hidden_size: 1024
+  depth: 12
+  num_heads: 8
+  patch_size: [1, 2, 2]
+  mlp_ratio: 4.0
+  drop_path: 0.0
+  qk_norm: true
+
+rflow_params:
+  num_train_timesteps: 1000
+
+sampling_params:
+  euler_steps: 10
+
+training_params:
+  # 3-GPU DDP run: micro 2 x accum 1 x world 3 = effective batch 6 (closest
+  # achievable to CRFT's default 4 on three cards; micro 2 is the largest
+  # per-card size the UOT pixel decode fits -- 2 x 20 = 40 grad-retaining
+  # decodes, measured 30.1 GB). The plain arm must later run with the SAME
+  # world_size / micro / accum, or the DistributedSampler partitioning and
+  # randn shapes differ and the matched-seed pairing breaks.
+  micro_batch_size: 2
+  grad_accumulation_steps: 1
+  num_epochs: 200
+  num_workers: 12
+  early_stopping_patience: 50
+  early_stopping_metric: "partial_csi_m"
+  gradient_clip_val: 1.0
+  fp16: true
+  save_latest_every_batches: 400
+
+optimizer_params:
+  learning_rate: 0.0005
+  optimizer_type: "adamw"
+  weight_decay: 0.0001
+
+scheduler_params:
+  scheduler_type: "cosine"
+  lr_plateau_factor: 0.2
+  lr_plateau_patience: 6
+  lr_cosine_warmup_iter_percentage: 0.01
+  lr_cosine_min_warmup_lr_ratio: 0.1
+  lr_cosine_min_lr_ratio: 0.01
+
+data_params:
+  dataset_name: "sevir"
+  data_key: "vil"
+  raw_seq_len: 25
+  input_length: 5
+  output_length: 20
+  lag_time: 5
+  lead_time: 20
+  time_spacing: 1
+  stride: 25
+
+evaluation_params:
+  pixel_scale: 255.0
+  thresholds: [16, 74, 133, 160, 181, 219]
+
+run_params:
+  debug_mode: false
+  enable_wandb: false
+  run_string: "sevirlr_uot"
+  preload_model: null
+  resume_latest_path: "artifacts/sevir_lr/flowcast/sevirlr_uot_latest.pt"
+
+partial_evaluation_params:
+  partial_evaluation: true
+  partial_evaluation_interval: 1
+  partial_evaluation_batches: 40
+  cartopy_features: false
+
+autoencoder_params:
+  autoencoder_checkpoint: "${DATA_ROOT}/saved_models/sevir/autoencoder/models/early_stopping_model.pt"
+  normalized_autoencoder: true
+  latent_channels: 4
+  norm_num_groups: 32
+  layers_per_block: 2
+  act_fn: "silu"
+  block_out_channels: [128, 256, 512, 512]
+  down_block_types:
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+    - "DownEncoderBlock2D"
+  up_block_types:
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+    - "UpDecoderBlock2D"
+
+ema_model_saving_params:
+  ema_model_saving: true
+  ema_model_saving_decay: 0.999
+
+test_params:
+  micro_batch_size: 6
+  num_workers: 12
+  probabilistic_samples: 1
+  batch_size_autoencoder: 12
+  euler_steps: 10
+  cartopy_features: false
+
+uot_params:
+  enabled: true
+  # SEVIR physics, NOT the CIKM settings: VIL is already an additive water
+  # content, so it needs no Z-R conversion, and 16 is the lowest evaluation
+  # threshold rather than CIKM's 0.5 dBZ floor. Copying the CIKM block here
+  # would silently price the wrong quantity.
+  mass_transform: "vil"
+  mass_low_threshold: 16.0
+  threshold_mode: "soft"
+  threshold_softness: 4.0
+  mass_gamma: 1.0
+  mass_scale: 100.0
+  mass_zero_point: 0.0
+  # M_ref left at the identity so `weight` is the single calibration knob.
+  # CALIBRATED 2026-07-28: a 20-min probe (flowcast_config_sevirlr_uot_probe
+  # .yaml, warmup 0, weight 5e-4) measured uot_ratio mean 1.443 +- 0.62
+  # (n=60). Target ratio ~0.10 (5-20% band per dist_train_flowcast.py:403),
+  # and the UOT term is linear in weight: 5e-4 * 0.10 / 1.443 = 3.5e-5.
+  value_scale_ref: 1.0
+  weight: 0.000035
+  t_power: 1.0
+  normalize_by_mass: false
+  dry_frame_mass: 0.001
+  # ~2 epochs: global_step advances by the PER-RANK micro_batch_size, so one
+  # epoch on 3 GPUs is 9698 / 3 = 3233 steps, not 9698.
+  warmup_steps: 6500
+  blur: 3.0
+  reach: 16.0
+  # 128 / 4 = 32, and sum_pool2d requires the factor to divide the side exactly.
+  downsample: 4
+  n_iters: 100
+  self_iters: 50

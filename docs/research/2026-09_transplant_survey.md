@@ -9,7 +9,7 @@
 
 | 优先级 | 论文方案 | 核心移植来源（均为 2025–2026 顶会/顶刊） | 临近预报是否已有人做 | 工程量 / 算力* | 适合期刊 |
 |---|---|---|---|---|---|
-| **主推** | **A. 拉格朗日式生成：运动-强度联合流匹配** | VideoJAM (ICML'25) + Go-with-the-Flow 光流扭曲噪声 (CVPR'25 Oral) + Diffusion Forcing / History Guidance (ICML'25) | 未检索到 | 3–4 周 / 约 2–3× | IEEE TGRS、npj Clim. Atmos. Sci.、GRL |
+| **主推** | **A. 拉格朗日式生成：运动-强度联合流匹配** | VideoJAM (ICML'25) + Go-with-the-Flow 光流扭曲噪声 (CVPR'25 Oral) + Diffusion Forcing / History Guidance (ICML'25) | “（雷达, 光流）联合去噪 + 运动引导”和“平流噪声”都未检索到；但“平流先验 + FM”这个邻域已经拥挤（PDRF ICML'26 等），必须讲清差异，见 §6 | 3–4 周 / 约 2–3× | IEEE TGRS、npj Clim. Atmos. Sci.、GRL |
 | 备选 1 | **B. 严格评分规则驱动的单步集合生成** | FGN / WeatherNext 2 (Nature'26) + AIFS-CRPS 多尺度 afCRPS + FourCastNet 3 谱 CRPS | 仅 IRENE（ConvGRU，2026-09）做了 CRPS 训练 | 4–6 周 / 约 1–1.5× | npj、JAMES、AMS AIES |
 | 备选 2（最快出结果） | **C. 流形内后训练 + 风险保证** | DiffusionNFT (ICLR'26 Oral) / AWM (ICML'26) + Conformal Risk Control | RL 仅 SynCast（DPO/SPO）；共形预测未见 | 2–3 周 / 约 0.5× | Information Fusion、KBS、ESWA、TGRS |
 | 插件 | 表征对齐（SRA / Dispersive / iREPA 对齐光流） | ICLR'26 三篇 | 未检索到 | 2–5 天 / 约 1× | 可作为上面任一方案的一个模块 |
@@ -51,19 +51,63 @@
 | 频域双分支 / 频域残差 | DuoCast (AAAI'26)、FreCast (2608.08436)、SDIR (ICML'26, 2606.02661)、PW-FouCast (2603.21768)、FADiff |
 | 残差扩散（确定性均值 + 扩散） | CasCast、DiffCast、DuoCast、exPreCast-ENS (2608.30205) |
 | 跨数据集零样本 | SDIR 已做 SEVIR→Shanghai；Nowcast3D；PostCast (ICLR'25，先验) |
-| 注意力能量正则 | HARECast (2605.13181) |
+| 注意力能量正则 | HARECast (ACM MM'26, 2605.13181) |
 | 振幅/相关性损失 (AMSE 类) | FACL (NeurIPS'24)、WFCL |
 | 普通 CFG | 已知会让 CRPS 变差（多篇报告） |
+| **平流先验 / 运动-强度分解 + FM/扩散** | **PDRF**（ICML'26，半拉格朗日“软教师”约束 RF 速度场，4 个数据集和我们相同）、Margin-based Intensity FM（TGRS'26，待核实）、MoCast（AAAI'26）、AlphaPre（CVPR'25，相位/振幅）、Nowcast3D、GSWarpNet |
+| 自 rollout 训练（确定性） | SimCast (ICME'25)。本仓库 RMLF 的 self-forcing 模式也没能在测试集上保持住增益 |
+| KAN | SwinKAN (TGRS'25)、KAN-evOnet、MFC-RFNet、PixelFlowCast |
+| 卫星 / NWP / GNSS 融合 | MAG-Net、FusionCast、RSG-GAN、GRENet、FuXi-Nowcast、RainPro-8、MeteoLogist 等，非常拥挤 |
+| 多模态大模型统一生成与理解 | Omni-Weather (ICLR'26)、WeatherSyn (ICML'26) |
 
 同时，**本仓库已经做过、不要重复立项**：像素空间 UOT 损失、WFR 插值、RMLF（教师 rollout 桥 / self-forcing 式条件）、Flow-GRPO、twCRPS/qwCRPS 蒸馏、ATFM 截断采样、频带门控 rollout、verifier best-of-N。
 
+**2025–2026 被录用论文的共同模式**：一个生成器或骨干，加上**一个从 ML 其他领域引进的模块**，再配一段气象上的理由，而且这个模块要对准一个有名字的失败模式（模糊、漂移、虚警、速度、不确定性丢失）。例如：MFC-RFNet = RF + KAN/RWKV/小波；PixelFlowCast = MeanFlow + KAN；SynCast = Diffusion-DPO + CSI/FAR 奖励；REE-TTT = TTT 层 + SimVP；McCast = 视频生成记忆 + 自回归潜变量；FREUD = masked diffusion forcing + Hourglass DiT。我们的方案也照这个模式来组织。
+
 ---
 
-## 3. 候选方法池（按来源领域）
+## 3. 要打败的 SOTA（本仓库配置与这些协议一致）
+
+本仓库的 SEVIR-LR（5→20，阈值 16/74/133/160/181/219）、Shanghai（5→20）和 CIKM（5→10，阈值 20/30/35/40 dBZ）配置，与 DiffCast 协议一致，所以下列数字可以直接比。
+
+| 数据集 | 当前最好 | CSI-M | HSS | 其他 | 来源 |
+|---|---|---|---|---|---|
+| SEVIR（DiffCast 协议，128²，5→20） | **MFC-RFNet** | **0.3552** | 0.4576 | CSI-219 0.1079 | 2601.03633（arXiv） |
+|  | HARECast | 0.3443 | 0.4369 | CSI-219 0.0978 | ACM MM'26 |
+|  | McCast | 0.339 | 0.438 | CSI-219 0.107 | 2605.13197 |
+|  | DuoCast / AlphaPre / DiffCast | 0.3375 / 0.3259 / 0.3050 | — | — | 同上各表 |
+| MeteoNet（同协议） | HARECast | 0.3933 | — | McCast 0.392，DuoCast 0.3892 | 同上 |
+| Shanghai2020 | **SDIR** | **0.4497** | 0.5882 | — | ICML'26 |
+| CIKM2017 | **SDIR** | **0.4043** | 0.4724 | SDIR 复现：Earthformer 0.3544，DiffCast 0.3477 | ICML'26 |
+
+**注意**：
+- DuoCast、HARECast、McCast 出自同一课题组，基线数字是他们自己的复现结果。
+- Shanghai 和 CIKM 的 SOTA 目前只核实到 SDIR。MFC-RFNet、PDRF、MoCast、FreCast 的表格在宣称 SOTA 前必须补查。
+- CRPS 跨论文基本不可比（归一化方式、成员数、pooling 都不同），只能在同一套评估框架内比较。
+- 原版 FlowCast 和 FREUD 用的是 384² 的 13→12 协议，和上表不是一套。
+
+---
+
+## 4. 期刊格局（2025–2026 录用实例）
+
+| 期刊 | 近期雷达临近预报论文 | 典型新颖度 |
+|---|---|---|
+| **IEEE TGRS** | 数量最多：Margin-based Intensity FM (2026)、SRDiff (2026)、S3NN、SwinKAN、RSG-GAN、Forecastformer 等 | 中等：“已知生成器 + 物理动机的分解或融合模块 + 多数据集” |
+| npj Clim. Atmos. Sci. | EchoCast-3D (2026，3D 雷达集合) | 看重新能力和气象检验，不看 SEVIR 刷榜 |
+| GRL | GRENet（GNSS + 雷达，2026）等 | 短文，要有物理故事和个例分析 |
+| JGR-MLC / AMS AIES | STNet 解耦潜因子、CONUS 扩散预报 (AIES 2026) | 重可解释性和检验，轻架构 |
+| EAAI / Neurocomputing / PR / TCSVT / NN | CRFT、NowcastDiff (EAAI)；RNDiff (PR)；SynCast (TCSVT)；LMcast (NN) | A+B 式生成模型移植，在公开数据集上刷榜 |
+| Information Fusion / KBS | 2025–26 **未见**雷达临近预报论文 | 竞争最少，但 Information Fusion 需要“融合”角度 |
+
+对应到方案：**A → TGRS 或 npj/GRL**（物理叙事加运动不确定性可视化）；**B → npj、JAMES 或 AIES**（重检验）；**C → TCSVT、EAAI 或 Information Fusion**。
+
+---
+
+## 5. 候选方法池（按来源领域）
 
 评分说明：“可发表性”1–5 分，综合了新颖性、来源热度和叙事强度；“算力”按一次 FlowCast 训练为 1×。
 
-### 3.1 视频生成 / 世界模型
+### 5.1 视频生成 / 世界模型
 
 | 方法 | 出处 | 核心机制 | 落到本仓库 | 工程 / 算力 | 可发表性 |
 |---|---|---|---|---|---|
@@ -76,7 +120,7 @@
 | Flow-Equivariant World Model | 2601.01075 (ICML'26) | 对平流（伽利略）群等变的记忆 | 需要重写主干 | 15 天以上 / 2–4× | 4，但风险高 |
 | Wan/Cosmos 视频大模型微调 | — | 视频先验迁移 | 脱离本代码库 | 5–10× | 另起一篇 |
 
-### 3.2 生成模型本体
+### 5.2 生成模型本体
 
 | 方法 | 出处 | 落到本仓库 | 工程 / 算力 | 可发表性 |
 |---|---|---|---|---|
@@ -90,7 +134,7 @@
 | α-Flow / TVM / 流图 | 2510.20771；2511.19797 (ICLR'26)；2505.18825 | 任意步数的模型；α-Flow 可从 FlowCast 热启动 | 1–2 周 / 1–2× | 2.5–3（PixelFlowCast、Tyche 已占“单步”叙事） |
 | EQ-VAE / 尺度等变“可扩散性” | 2502.09509；2502.14831 (ICML'25) | 在 AE 训练脚本里加几行正则 | 2–3 天 / 0.15 + 1× | 3 |
 
-### 3.3 AI 天气 / 科学机器学习
+### 5.3 AI 天气 / 科学机器学习
 
 | 方法 | 出处 | 落到本仓库 | 工程 / 算力 | 可发表性 |
 |---|---|---|---|---|
@@ -102,7 +146,7 @@
 | 随机扰动权重 SPW | 2609.08412 | 推理时扰动权重，得到认知不确定性 | 2–3 天 / 0 | 2 |
 | 评估套件：变差图分数、差异谱、签名核 | 2608.08954；2609.18489；2510.19110 | 在已有 `crps.py`、`fss.py`、`band_spectral.py` 上补齐 | 2–4 天 / 0 | 支撑所有方案 |
 
-### 3.4 跨领域新范式
+### 5.4 跨领域新范式
 
 | 方法 | 出处 | 落到本仓库 | 工程 / 算力 | 可发表性 |
 |---|---|---|---|---|
@@ -114,7 +158,7 @@
 
 ---
 
-## 4. 推荐的三套论文方案
+## 6. 推荐的三套论文方案
 
 ### 方案 A（主推）：拉格朗日式生成临近预报
 
@@ -128,9 +172,15 @@
 | **M2 平流噪声先验** | Go-with-the-Flow (CVPR'25 Oral) / EquiVDM；FCN3 有状态噪声 | 噪声沿运动场扭曲，并在块与块之间延续，让集合成员在拉格朗日框架里保持身份；可能降低采样步数 | `sample_chunk_euler` 和训练时的噪声构造；复用 `precompute_flow.py` |
 | **M3 观测锚定的历史引导** | Diffusion Forcing / DFoT History Guidance (ICML'25)；LongLive frame sink (ICLR'26) | 当前每块只看上一块生成的 5 帧，真实观测在第 1 块之后就丢掉了（Markov 链）。M3 让每块都能看到观测，并用引导强度来调 | 条件通道 3×C，零初始化；采样时加一项引导 |
 
+**和拥挤邻域的差异（写进引言和相关工作，这是审稿人第一个会问的）**：
+- PDRF、Margin-FM、NowcastNet、AlphaPre、GSWarpNet 等，都是**确定性的运动先验**：先估一个运动场或做半拉格朗日外推，然后拿它去约束或引导强度生成。所有成员共用一个运动场。
+- 方案 A 把运动当作**被生成的随机变量**：每个成员有自己的运动场和生消场，运动的不确定性可以量化；噪声本身也在拉格朗日框架里平流。这对应的是 STEPS 的“随机扰动随流场移动”思想，而不是“外推 + 修正”。
+- M3 和 FREUD 的 masked diffusion forcing 的区别：FREUD 在训练时对条件帧做掩码，以支持变长输入；M3 是在分块自回归中**始终保留观测锚**，并在采样时对历史做引导。
+- 如果审稿人仍然认为 M1 与 PDRF 太近，可以把重心移到 M2 + M3，M1 退为一个模块。M2 是整个方案里新颖性最干净的一块。
+
 **实验设计（按期刊标准）**：
-- **数据集**：SEVIR-LR、CIKM、Shanghai2020、MeteoNet。4 个数据集本身就是卖点。
-- **对比方法**：FlowCast、FREUD、PixelFlowCast、SDIR、McCast、MFC-RFNet、DiffCast、CasCast、PreDiff、STLDM、pySTEPS（能复现的复现，其余引用论文数字并注明协议）。
+- **数据集**：SEVIR-LR、CIKM、Shanghai2020、MeteoNet。4 个数据集本身就是卖点，而且和 PDRF、MFC-RFNet 完全重合，便于正面比较。
+- **对比方法**：FlowCast、FREUD、PDRF、MFC-RFNet、SDIR、HARECast、McCast、DuoCast、AlphaPre、PixelFlowCast、DiffCast、CasCast、pySTEPS（能复现的复现，其余引用论文数字并注明协议）。
 - **指标**：CSI/HSS（含 pool 4/16）、CSI-M、FSS、CRPS、spread–skill、rank histogram，变差图分数（新增，零成本）；再加推理时间和 NFE。
 - **消融**：M1 / M2 / M3 逐个加入；M1 对比“iREPA 特征层对齐光流”（输出层联合生成 vs 特征层对齐）；M1 有无生消通道；M2 的 ρ 剂量。
 - **可视化卖点**：每个成员自带运动场和生消场，直接支持“运动不确定性量化”。这正是业务预报员关心的，GRL/npj 类期刊很吃这一点。
@@ -164,7 +214,7 @@
 
 ---
 
-## 5. 执行顺序（先用低成本先导实验选定主线）
+## 7. 执行顺序（先用低成本先导实验选定主线）
 
 | 周次 | 事项 | 需要训练吗 |
 |---|---|---|
@@ -175,7 +225,7 @@
 
 ---
 
-## 6. 投稿前必须人工复核的新颖性
+## 8. 投稿前必须人工复核的新颖性
 
 各检索代理共用的网络搜索额度中途用完了，arxiv.org 和 OpenReview 的直接抓取也被代理拦截。所以“未检索到”只代表**有限检索没找到**。投稿前请在 Google Scholar 上逐条查：
 
@@ -185,10 +235,12 @@
 - “functional generative network” / “CRPS” + nowcasting transformer
 - “conformal” + nowcasting
 - “DiffusionNFT” / “advantage weighted matching” + weather
+- **PDRF**（ICML'26，OpenReview UCfAMteKOc）和 **Margin-based Intensity FM**（TGRS'26, DOI 10.1109/TGRS.2026.3704556）的全文：确认它们的运动先验是否是确定性的、是否每个成员共用，这决定方案 A 的差异化表述
+- MFC-RFNet、PDRF、MoCast 在 Shanghai 和 CIKM 上的数字（§3 表格目前只核实到 SDIR）
 
 ---
 
-## 7. 主要参考（均来自本次检索）
+## 9. 主要参考（均来自本次检索）
 
 - VideoJAM: https://arxiv.org/abs/2502.02492 ｜ https://icml.cc/virtual/2025/poster/43541
 - Go-with-the-Flow: https://github.com/Eyeline-Labs/Go-with-the-Flow （arXiv 2501.08331）
@@ -198,4 +250,4 @@
 - FGN: https://arxiv.org/abs/2506.10772 ｜ AIFS-CRPS: https://arxiv.org/abs/2412.15832 ｜ 多尺度 CRPS: https://arxiv.org/abs/2506.10868 ｜ FCN3: https://arxiv.org/abs/2507.12144
 - ATLAS: https://arxiv.org/abs/2601.18111 ｜ PCFM: https://github.com/cpfpengfei/PCFM
 - SRA: arXiv 2505.02831 ｜ iREPA: arXiv 2512.10794 ｜ Dispersive Loss: arXiv 2506.09027 ｜ Autoguidance: arXiv 2406.02507
-- 竞品：FREUD https://arxiv.org/abs/2605.31204 ｜ PixelFlowCast https://arxiv.org/abs/2605.10046 ｜ MFC-RFNet https://arxiv.org/abs/2601.03633 ｜ SDIR https://arxiv.org/abs/2606.02661 ｜ McCast arXiv 2605.13197 ｜ SynCast https://arxiv.org/abs/2510.21847 ｜ REE-TTT https://arxiv.org/abs/2601.01605 ｜ IRENE https://arxiv.org/abs/2609.17175 ｜ exPreCast-ENS https://arxiv.org/abs/2608.30205 ｜ FreCast https://arxiv.org/abs/2608.08436 ｜ FusionCast https://arxiv.org/abs/2603.13298
+- 竞品：FREUD https://arxiv.org/abs/2605.31204 ｜ PDRF（ICML'26，OpenReview UCfAMteKOc）｜ HARECast https://arxiv.org/abs/2605.13181 ｜ DuoCast https://arxiv.org/abs/2412.01091 ｜ AlphaPre https://github.com/linkenghong/AlphaPre ｜ PixelFlowCast https://arxiv.org/abs/2605.10046 ｜ MFC-RFNet https://arxiv.org/abs/2601.03633 ｜ SDIR https://arxiv.org/abs/2606.02661 ｜ McCast arXiv 2605.13197 ｜ SynCast https://arxiv.org/abs/2510.21847 ｜ REE-TTT https://arxiv.org/abs/2601.01605 ｜ IRENE https://arxiv.org/abs/2609.17175 ｜ exPreCast-ENS https://arxiv.org/abs/2608.30205 ｜ FreCast https://arxiv.org/abs/2608.08436 ｜ FusionCast https://arxiv.org/abs/2603.13298

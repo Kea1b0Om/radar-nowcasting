@@ -1,0 +1,351 @@
+# 附录 B2：判为不相关的速读条目（只列标题）
+
+- 2506.01212 Dynamic Modes as Time Representation for Spatiotemporal Forecasting — 用 DMD 从长历史序列中提取周期模态作为时间嵌入，建模长程季节性。
+- 2506.03728 Spatiotemporal Prediction of Electric Vehicle Charging Load Based on Large Language Models — 用 GCN 提取充电站时空特征，结合微调 LLaMA2-7B 与文本提示前缀（含天气等多模态信息），预测多站点电动车充电负荷。
+- 2506.07199 Audio synthesizer inversion in symmetric parameter spaces with approximately equivariant flow matching — 合成器参数反演存在置换对称，点估计回归会在等价解之间取平均而退化。论文改用条件 CNF/流匹配，并提出 Param2Tok 从数据中学习松弛的置换等变。
+- 2506.07280 From Generation to Generalization: Emergent Few-Shot Learning in Video Diffusion Models — 把输入→输出任务改写成“过渡视频”，在冻结的预训练视频扩散模型（CogVideoX1.5/LTX）上用 LoRA 少样本微调，做分割、姿态估计、ARC 等任务。
+- 2506.07582 Scalable Spatiotemporal Modeling for Bicycle Count Prediction — 用稀疏时空动态广义线性模型（Poisson，SPDE 稀疏高斯场，混合 MCMC）对自行车计数做贝叶斯预测、插补和克里金。
+- 2506.08009 Self Forcing: Bridging the Train-Test Gap in Autoregressive Video Diffusion — 自回归视频扩散的暴露偏差问题：训练时就用模型自己生成的前序帧做 KV-cache 自回归展开（few-step），在整段生成视频上加分布匹配损失（DMD/SiD/GAN），弥合训练和推理之间的差距。
+- 2506.09733 AtmosMJ: Revisiting Gating Mechanism for AI Weather Forecasting Beyond the Year Scale — 在经纬网格上用不下采样的 InceptionNeXt CNN 加门控残差融合（GRF），实现约 500 天的稳定自回归全球预报，不需要球谐或 HEALPix 重映射。
+- 2506.11987 Forecast error diagnostics in neural weather models — 用 ConvCastNet 做两类诊断：一是把局部子区域用平滑掩码向真值松弛（nudging），观察其他区域技巧的变化；二是计算预报误差对输入场的梯度敏感度，用来定位误差来源。
+- 2506.12456 Demographics-Informed Neural Network for Multi-Modal Spatiotemporal forecasting of Urban Growth and Travel Pat — 联合卫星影像序列与人口统计数据预测未来城市影像；用门控跳连 U-Net，再通过冻结编码器把预测影像映射到人口属性，施加一致性损失。
+- 2506.13652 PeakWeather: MeteoSwiss Weather Station Measurements for Spatiotemporal Deep Learning — MeteoSwiss 302 个站点、10 分钟分辨率、8 年以上的地面观测基准数据集，附 NWP 基线。
+- 2506.18939 Damba-ST: Domain-Adaptive Mamba for Efficient Urban Spatio-Temporal Prediction — 解决城市交通/出行时空基础模型的跨城市（跨域）泛化与 Transformer 二次复杂度问题：Mamba 主干，分共享子空间和域专属子空间，并用可学习的域适配器 token 充当域代理。
+- 2506.19088 Finetuning a Weather Foundation Model with Lightweight Decoders for Unseen Physical Processes — 冻结 Aurora 基础模型，在潜表示上为新水文变量（含降水）各训练一个 3 层 MLP 解码器，与全量微调（Aurora+）对比成本与精度。
+- 2506.22450 Arnoldi Singular Vector perturbations for machine learning weather prediction — 提出无伴随的 Arnoldi 奇异向量法：用非线性模型对扰动的演化增量构造 Krylov 子空间，找出 Pangu-Weather 输入中增长最快的扰动方向，作为 MLWP 集合初始化的候选。
+- 2506.23154 Can LLM Improve for Expert Forecast Combination? Evidence from the European Central Bank Survey — 用 LLM 组合 ECB 专业预测者调查（SPF）的宏观专家预测，与简单平均比较；在短期和部分指标上略优，发现专家分歧大时各组合方法的表现依指标不同而反转。
+- 2507.00031 Enhancing Spatio-Temporal Forecasting with Spatial Neighbourhood Fusion:A Case Study on COVID-19 Mobility in P — 针对 H3 网格上稀疏的小时级移动流量，把每个格与邻域的中位数/均值拼成 3 通道输入（SPN），与模型无关地提升多种时序主干。
+- 2507.01354 Efficient Kilometer-Scale Precipitation Downscaling with Conditional Wavelet Diffusion — 在 Haar 小波系数域做条件扩散，把 MRMS 反射率从 10km 降尺度到 1km；在 Tweedie x̂0 的细节子带上加 TV 正则抑制斑点，采样比像素域 EDM 快约 9 倍。
+- 2507.02939 Frequency-Aligned Knowledge Distillation for Lightweight Spatiotemporal Forecasting — 把重型 CNN-Transformer 或 SimVP 教师蒸馏成轻量学生（U-Net/ResNet/MLP-Mixer），手段是高/低频分离的特征对齐损失，外加多教师梯度空间自适应加权（A2D/AEKD），目的是提速。
+- 2507.04794 Generalization bounds for score-based generative models: a synthetic proof — 纯理论工作：在 Hölder-β 光滑密度假设下，证明用 DSM 训练的神经网络 score 估计器，在 W1 距离下达到极小极大速率 n^{-(β+1)/(2β+d)}，确定性和随机采样器都适用。
+- 2507.07917 Convergence rates for regularized unbalanced optimal transport: the discrete case — 纯理论：两个离散测度之间的熵正则UOT，当 ε→0 时最优计划和对偶势向未正则解收敛的速率。
+- 2507.09166 Investigating the Robustness of Extreme Precipitation Super-Resolution Across Climates — 用 VGLM/VGAM 直接超分辨小时降水极值的 GEV 分布参数，并提出'鲁棒性差距'（当前气候训练 vs 未来气候训练的误差差），用来诊断极值分位上的泛化失败。
+- 2507.09202 XiChen: A global weather observation-to-forecast machine learning system via four-dimensional variational grad — 用 4DVar 代价函数对背景场的梯度作为统一接口，把各类异构观测喂给 ML 同化模型，从而搭建一套从观测直接到预报的全球 ML 系统。
+- 2507.10893 Modernizing CNN-based Weather Forecast Model towards Higher Computational Efficiency — KAI-α：按 ConvNeXt 式路线把 DLWP 的 CNN 现代化（InceptionNeXt 带状卷积、倒残差、GELU、全程不下采样），约 7M 参数，在 ERA5 全球中期预报上与 SOTA 持平。
+- 2507.11558 Reprogramming Vision Foundation Models for Spatio-Temporal Forecasting — 冻结图像视觉基础模型（DINO/CLIP/DeiT），加前后两段“重编程”适配器，做城市网格时空预报；另开一个时间差分（ST-Flow）输入分支，并加时间差分预测的辅助损失。
+- 2507.12306 MaCE: General Mass Conserving Dynamics for Cellular Automata — 给元胞自动机加一条局部softmax质量再分配规则，让它严格质量守恒；连续极限等于扩散加沿亲和度梯度的平流。
+- 2507.12474 Spatio-Temporal Prediction via Operator-Valued RKHS and Koopman Approximation — 纯理论文章：算子值 RKHS 的表示定理、Sobolev 逼近率和核 Koopman 谱收敛，只有玩具实验。
+- 2507.14453 Generalized optimal parameter-transfer learning through Mallows-type model averaging — 多源参数迁移的模型平均：用广义 Mallows 准则选权重（样本内残差加上目标模型自由度的惩罚），证明渐近最优和权重一致性，应用于房价预测。
+- 2507.15416 Sufficiency-principled Transfer Learning via Model Averaging — 统计学论文：在不知道哪些源域可迁移时，用带'充分性惩罚'的 q-aggregation 式模型平均（单纯形权重）做多源线性回归迁移，理论保证不发生负迁移。
+- 2507.17650 XStacking: Explanation-Guided Stacked Ensemble Learning — stacking 集成的元学习器输入不只用基模型的预测，还拼接各基模型的 SHAP 归因向量，同时提升精度和可解释性（4 页扩展摘要）。
+- 2507.18378 A comparison of stretched-grid and limited-area modelling for data-driven regional weather forecasting — 在 Anemoi 的 GNN 框架下比较区域 MLWP 的两种做法：受限区域模型（LAM，外部侧边界强迫）和拉伸网格模型（SGM，同时预报低分辨率全球域）。结论是 SGM 对未见的一天中时次泛化更好，作者归因于它见过更多数据。
+- 2507.20478 Conditional Diffusion Models for Global Precipitation Map Inpainting — 把 GSMaP 卫星降水的轨道缺测补全表述成视频修补：用 3D U-Net 的 v-pred DDPM 加 3D 条件编码器（掩码降水、二值掩码、IR、时空静态场），采样时把观测区替换回真值。
+- 2507.21299 Blending data and physics for reduced-order modeling of systems with spatiotemporal chaotic dynamics — AE 潜空间里用 Neural ODE 学混沌 PDE 的动力学。把全阶物理模型投影到潜空间作为先验向量场：一种是数据残差修正（-c），另一种是贝叶斯/迁移式权重先验（-B）。在数据稀缺、物理参数有误时后者仍有增益。
+- 2508.01426 UniExtreme: A Universal Foundation Model for Extreme Weather Forecasting — 通用天气基础模型对极端区域预报偏平滑，作者加了两样东西：按区域自适应的 Beta 频率滤波（AFM），以及用训练集里真实极端区域块构建原型记忆库、再由注意力融合进输入（EPA）。
+- 2508.03590 SolarSeer: Ultrafast and accurate 24-hour solar irradiance forecasts outperforming numerical weather predictio — 用过去 6 小时 GOES 卫星图，经 AFNO 云块预报未来 24 小时云量，再由 Swin 辐照块结合晴空辐照物理先验输出辐照度，精度超过 HRRR。
+- 2508.03614 Minimal Convolutional RNNs Accelerate Spatiotemporal Learning — 把 MinLSTM/MinGRU 的对数域并行前缀扫描推广到卷积 RNN（门只依赖输入，不依赖隐状态）。训练提速 3–5 倍，在 Navier–Stokes 和 WeatherBench Φ500 上 RMSE 低于 ConvLSTM/Co
+- 2508.03845 Operational convection-permitting COSMO/ICON ensemble predictions at observation sites (CIENS) — 发布德国气象局对流可分辨集合预报在 170 个站点上的数据集（2010–2023，覆盖多次模式升级），并用 EMOS 和梯度提升 EMOS 做后处理示例。
+- 2508.06335 ViPro-2: Unsupervised State Estimation via Integrated Dynamics for Guiding Video Prediction — 在嵌入已知动力学方程（程序性知识）的视频预测中，去掉对真实初始符号状态的依赖。做法是无监督的观测对齐损失，加上 Kalman 式可学习增益，融合预测态与观测态。
+- 2508.06859 MeteorPred: A Meteorological Multimodal Large Model and Dataset for Severe Weather Event Prediction — 构建 ERA5 4D 场与强天气预警文本配对的 MP-Bench，并在 MLLM 前面加了三个即插即用融合模块（时间差门控 DTGF、文本引导空间高斯掩膜 TGS、文本引导通道注意力 TGCA），用于强天气事件问答和预警。
+- 2508.07136 Bayesian Forecast Combination with Predictive Priors via Particle Filtering — 贝叶斯时变权重的预报组合：权重的潜过程除了自回归，还回归到只由各成员预报算出的“缩放多样性”这一前瞻信号上，用粒子滤波更新，用于油价和宏观序列。
+- 2508.07659 Discovering Spatial Correlations of Earth Observations for weather forecasting by using Graph Structure Learni — CloudNine-v2：在观测与 NWP 格点的时空 GNN 中，用 Gumbel-softmax 自适应节点度的结构学习，并加入距离特征约束，缓解结构学习边过多带来的过平滑。
+- 2508.08825 Wavelet Mixture of Experts for Time Series Forecasting — 轻量时间序列预测：RevIN 后做 DWT，低频/高频分量分别过 MLP；多通道版本对低频分量用 MoE 门控做通道聚类，参数量低且精度达到 SOTA。
+- 2508.09753 TriForecaster: A Mixture of Experts Framework for Multi-Region Electric Load Forecasting with Tri-dimensional  — 多区域电力负荷预报：堆叠 RegionMixer（区域混合）和 CTSpecializer（上下文 MoE 加时间维 MoE），在区域、上下文、时间三个维度上做专家分工，外加一个把相似上下文样本推向相同专家的对比损失。
+- 2508.10705 Probabilistic Forecasting Method for Offshore Wind Farm Cluster under Typhoon Conditions: a Score-Based Condit — 台风条件下海上风电集群概率预测：确定性网络预测功率，均值回复 SDE 条件扩散生成预测误差，二者叠加。
+- 2508.11923 Scale-Disentangled spatiotemporal Modeling for Long-term Traffic Emission Forecasting — 路网CO排放的长时效预报：用门控小波把序列拆成稳定/动态两路，各配静态GCN与动态注意力的空间模块，再分别用全局Koopman算子和逐样本eDMD局部Koopman算子外推，减轻多尺度耦合带来的误差累积。
+- 2508.17903 Global Forecasting of Tropical Cyclone Intensity Using Neural Weather Models — 对 Pangu/FourCastNetv2 输出做轻量后处理（MLR/ANN/CNN/UNet）来预测台风强度，发现小数据下直接吃 2D 场的 CNN 严重过拟合。
+- 2508.18486 Huracan: A skillful end-to-end data-driven system for ensemble data assimilation and weather prediction — 端到端观测驱动的集合资料同化+集合预报系统（SFNO+Swin，CRPS 训练），在 1° 全球尺度上 CRPS 接近 ECMWF ENS。
+- 2508.18565 Improving Long-term Autoregressive Spatiotemporal Predictions: A Proof of Concept with Fluid Dynamics — Stochastic PushForward：每个 epoch 间用模型的 δ 步自回归预测构建补充数据集，训练时以 Bernoulli(p) 在真实输入与自生成输入之间随机抽取，并按 α 加权一步损失，低显存地兼顾短期和长期精度。
+- 2509.00017 Observation-guided Interpolation Using Graph Neural Networks for High-Resolution Nowcasting in Switzerland — MeteoSwiss 用 Anemoi GNN 在 1km/10min 分辨率上做 0–6h 地面多要素临近预报，融合站点、雷达、卫星和 ICON NWP 的过去/未来状态（'观测引导插值'），并为没有分析场的情况设计了多源损失（L-AIN
+- 2509.00464 Semiparametric model averaging for high-dimensional quantile regression with nonignorable nonresponse — 统计学方法：在非随机缺失（MNAR）响应下做高维分位数回归的半参数模型平均，权重由带惩罚的 check-loss 准则选择，并证明渐近最优。
+- 2509.00653 IndiaWeatherBench: A Dataset and Benchmark for Data-Driven Regional Weather Forecasting over India — 基于 IMDAA 再分析的印度区域天气预报基准，比较 UNet/Stormer/GraphCast/Hi 和两种边界条件策略。
+- 2509.00703 Robust Spatiotemporal Forecasting Using Adaptive Deep-Unfolded Variational Mode Decomposition — 把 VMD 展开成固定深度的可训练网络，并学习 mode-specific 带宽 α_k，把交通信号分解成频带后送入 ASTGCN 预测，分解耗时降低约 250 倍。
+- 2509.01879 MAUSAM: An Observations-focused assessment of Global AI Weather Prediction Models During the South Asian Monso — 用站点、雨量计和卫星观测评估 7 个全球 AI 天气模型在南亚季风期的表现，发现强降水尾部系统性低估。
+- 2509.03887 OccTENS: 3D Occupancy World Model via Temporal Next-Scale Prediction — 3D 占据世界模型：把逐帧自回归改成'时间上逐场景、空间上逐尺度'的 VAR 式 next-scale token 预测，用尺度级时间因果注意力加帧内全注意力，解决长时生成退化和效率问题。
+- 2509.04225 Sharp Convergence Rates of Empirical Unbalanced Optimal Transport for Spatio-Temporal Point Processes — 纯统计理论：对时空点过程强度测度的经验UOT（(p,C)-Kantorovich–Rubinstein距离）给出尖锐收敛速率和极小极大下界。
+- 2509.05779 Select, then Balance: Exploring Exogenous Variable Modeling of Spatio-Temporal Forecasting — 时空预测引入外生变量的通用框架。“选择”指用潜空间门控专家重组外生信号；“平衡”指过去和未来两支孪生编码，再用上下文感知门权融合。
+- 2509.08816 A Benchmark Dataset for Satellite-Based Estimation and Detection of Rain — IPWG 发布的卫星降水检测与估计 AI 基准 SatRain：输入为被动微波（GMI/ATMS 等）和静止卫星观测，参考为雨量计订正的地基雷达（CONUS 用 MRMS），另有韩国（雷达+雨量计）和奥地利（WegenerNet 雨量计）两
+- 2509.11903 Wavelet-SARIMA-Transformer: A Hybrid Model for Rainfall Forecasting — 印度东北 5 个气象分区 1971–2023 年的月雨量单变量时间序列：MODWT 小波分解后，SARIMA 建模线性/季节分量，Transformer 建模非线性分量，再逆变换重建。
+- 2509.12708 Spatio-temporal DeepKriging in PyTorch: A Supplementary Application to Precipitation Data for Interpolation an — 欧洲站点日降水的时空 DeepKriging（多分辨率基函数嵌入+MLP）插值，以及 ConvLSTM/STDK 概率预报；用分位数损失同时输出中位数和 95% 区间。
+- 2509.13753 ST-LINK: Spatially-Aware Large Language Models for Spatio-Temporal Forecasting — 交通需求和速度预测：给冻结了一部分的 GPT-2 加上空间 RoPE（SE-Attention）和记忆检索 MoE 前馈（MRFFN），弥补 LLM 空间建模的不足。
+- 2509.14934 Mitigating data replication in text-to-audio generative diffusion models through anti-memorization guidance — 把图像域的 Anti-Memorization Guidance（AMG）搬到文生音频潜扩散（Stable Audio Open）：推理时一旦生成结果与训练集最近邻的相似度超过阈值，就加引导项把生成推离被记住的样本。
+- 2509.15349 Probabilistic Conformal Coverage Guarantees in Small-Data Settings — split conformal 的覆盖率只在期望意义上成立，小校准集时单次划分波动很大；作者用覆盖率服从 Beta 分布这一精确结论调整显著性水平（SSBC），得到“以概率 1-δ 覆盖率不低于目标”的 PAC 保证。
+- 2509.17601 FastNet: Improving the physical consistency of machine-learning weather prediction models through loss functio — GNN 全球确定性模型 FastNet 的损失设计：球谐谱幅度损失、水平梯度损失、风速/风向解耦损失，用来减轻模糊、网格伪影和风速低估。
+- 2509.17658 Technical overview and architecture of the FastNet Machine Learning weather prediction model, version 1.0 — FastNet v1.0 技术报告：encode-process-decode GNN + 多级 icosahedral mesh + 残差增量预测 + 多步 rollout 微调。
+- 2509.18115 Towards Scalable and Structured Spatiotemporal Forecasting — 大规模路网时空预测：先划分子图，子图内做局部注意力，再把子图池化成 token 做子图间注意力，逐层放大子图尺度，在全局相关和局部邻近之间取平衡并降低开销。
+- 2509.18176 A Deep Learning Approach for Spatio-Temporal Forecasting of InSAR Ground Deformation in Eastern Ireland — 把 Sentinel-1 InSAR 的稀疏点位形变线性插值成稠密网格时空张量，再用 CNN-LSTM 预测，比 LASSO/LightGBM 更准。
+- 2509.19234 Stability and Generalization of Adversarial Diffusion Training — 这里的“diffusion”指去中心化分布式学习里的 diffusion 策略，不是扩散生成模型。论文对凸损失下的分布式对抗训练做稳定性泛化界：泛化误差随扰动强度和训练步数增长。
+- 2509.19526 Metriplectic Conditional Flow Matching for Dissipative Dynamics — 把条件流匹配的速度场写成「守恒项+耗散项」(v=J∇H−G∇Φ，J 反对称、G 半正定)，采样时用 Strang 分裂+近端收缩步，外加一个可选的能量单调投影，让学到的耗散系统在 rollout 中能量单调衰减。只在阻尼摆玩具任务上做了实验
+- 2509.19648 S$^2$Transformer: Scalable Structured Transformers for Global Station Weather Forecasting — 全球站点天气预报：用 METIS 把空间图划成子图，子图内做注意力、子图池化后在子图间做注意力，再加最短路径偏置，兼顾局部与全局相关，同时降低 O(N²) 开销。
+- 2509.20911 Mesh Interpolation Graph Network for Dynamic and Spatially Irregular Global Weather Forecasting — 全球站点分布不规则且随时间变化：先把站点插值到规则 mesh 上做 GNN 消息传递再插值回站点，并用参数化球谐位置嵌入，让模型能泛化到训练时没见过的站点。
+- 2509.21260 A Causality-Aware Spatiotemporal Model for Multi-Region and Multi-Pollutant Air Quality Forecasting — 多区域、多污染物空气质量预报：图空间相关、分 patch 嵌入，再加气象到污染物的时间因果模块，并单独评估'突变事件'子集。
+- 2509.22020 Task-Adaptive Parameter-Efficient Fine-Tuning for Weather Foundation Models — WeatherPEFT 面向气象基础模型（Aurora 等）做参数高效微调：TADP 动态提示，SFAS 用 Fisher 信息加退火随机项挑出 top-k 参数只更新这些，在降尺度、集合后处理和区域降水任务上接近甚至超过全量微调。
+- 2509.23267 Learning Regional Monsoon Patterns with a Multimodal Attention U-Net — 印度 5 个邦 2024 年季风季、1km 网格上按 IMD LPA 类别（亏缺/正常/过量等）做降水分类：7 种卫星/再分析模态输入注意力 U-Net，用 focal+dice 损失处理类别不平衡。
+- 2509.24081 Autoregressive Video Generation beyond Next Frames Prediction — VideoAR：把自回归视频生成的预测单元从'帧'推广到关键帧加细节帧、多尺度、时空立方体，发现立方体最好；训练用对称 DMD 蒸馏（生成分数由前向和后向两个因果模型组成）。
+- 2509.25161 Rolling Forcing: Autoregressive Long Video Diffusion in Real Time — 实时流式长视频生成：窗口内各帧按时效递增的噪声水平联合去噪（rolling diffusion window），加上首帧 KV 作为 attention sink，再配合 self-forcing 与 DMD 少步蒸馏，抑制长程误差累积。
+- 2509.25210 STCast: Adaptive Boundary Alignment for Global and Regional Weather Forecasting — 全球-区域耦合预报：用带大圆距离指数衰减先验的可学习分布调制交叉注意力（SAA），自适应决定区域边界；再用以月份为峰的高斯先验做 MoE 路由（TMoE）分配专家。
+- 2509.25268 A Weather Foundation Model for the Power Grid — 把 1.5B 参数的天气基础模型 GFT 用 Hydro-Québec 资产观测微调，做站点级温度、降水、风、结冰预报：回归头加结冰概率分类头，稀有结冰事件的 AP 约 0.72。
+- 2509.25515 Spatiotemporal Forecasting of Incidents and Congestion with Implications for Sustainable Traffic Control — 用 SUMO 仿真生成事故场景，再用 BiLSTM 定位事故时空区间、DCRNN 预测拥堵和排放；损失为带尖峰加权的区间损失，推理时再做 conformal 校准。
+- 2510.02414 RainSeer: Fine-Grained Rainfall Reconstruction via Physics-Guided Modeling — 用稀疏自动站（AWS）加雷达反射率序列重建稠密地面雨量场（空间插值/QPE，不是临近预报）。结构为双向交叉注意力对齐雷达与站点、Laplacian 边界分支，以及因果时空注意力。
+- 2510.03589 FieldFormer: Locality-Aware Transformers for Spatio-Temporal Modeling on Sparse Sensor Networks — 极稀疏传感器网络下的场重建和插补：用可学习的速度缩放时空距离选邻域，局部 Transformer 聚合，再用神经场保证全局一致。
+- 2510.04006 Learning more physically realistic dynamics in machine-learning based weather forecasting with latent-space co — 把确定性预报模型的 rollout 训练重述为 4DVar 问题，把损失放到预训练自编码器的潜空间（那里误差协方差近似对角），以保留细尺度结构和多变量一致性；并扩展到再分析+多源观测联合训练。
+- 2510.06286 Mass Conservation on Rails -- Rethinking Physics-Informed Learning of Ice Flow Vector Fields — 用『预测流函数再取辛梯度』的无散神经网络硬约束冰通量场局部质量守恒，并用卫星速度方向的余弦损失做『方向引导』。
+- 2510.08625 Adjusting Initial Noise to Mitigate Memorization in Text-to-Image Diffusion Models — 文生图扩散模型会在 CFG 形成的吸引盆中复现训练图像。作者发现初始噪声决定逃出吸引盆的时刻，于是提出批级和逐样本两种初始噪声调整：用类 SAM 的锐度梯度步，或逐样本优化条件噪声预测差的范数，让轨迹更早逃离吸引盆，从而减少训练图复现。
+- 2510.08893 Quantifying Very Extreme Precipitation and Temperature Using Huge Ensembles Generated by Machine Learning-base — 统计学评估：用 ACE2 生成 10560 年巨型集合，检验极值分析估计极端降水和温度重现水平的偏差与不确定性。结论：降水要用阈值足够高的 POT/GPD，年最大值 GEV 明显上偏；模拟器能产生超出 ERA5 训练范围的极值。
+- 2510.10702 Attention-Enhanced LSTM Modeling for Improved Temperature and Rainfall Forecasting in Bangladesh — 用 LSTM + 时间步注意力预测孟加拉国月尺度气温和降雨序列（1901–2023），与 XGBoost、LSTM、GRU 比较 MSE、MAE、R²。
+- 2510.11209 Cross-Scale Reservoir Computing for large spatio-temporal forecasting and modeling — 多分辨率分层储备池计算：低分辨率层把慢模态和长程信息传给高分辨率局部储备池，用于海表温度（SST）长期预报。
+- 2510.11276 Information-theoretic analysis of temporal dependence in discrete stochastic processes: Application to precipi — 用块熵导出的'可预测性增益'配合 bootstrap 检验与 Fisher 合并，估计离散过程（日降水有/无序列）的 Markov 阶数；应用于美国日降水站点，发现多为低阶 Markov。
+- 2510.11964 Normalization-equivariant Diffusion Models: Learning Posterior Samplers From Noisy And Partial Measurements — 只有带噪、不完整观测时如何训练扩散后验采样器：利用 MMSE 去噪器近似满足的归一化等变性 D(αy+μ,ασ)=αD(y,σ)+μ，把 SURE 损失推广到低于测量噪声的噪声水平；再结合等变成像（EI）损失学习算子零空间。
+- 2510.12148 Probabilistic Super-Resolution for Urban Micrometeorology via a Schr"odinger Bridge — 用 Schrödinger 桥模型（Chen et al. 2024）从低分辨率场的点质量 δ(x−xLR) 出发，直接扩散到高分辨率条件分布，做城市 2 m 温度超分：10 步即达到扩散模型 50 步的精度，集合离散度也更好。
+- 2510.13927 Long-Term Spatio-Temporal Forecasting of Monthly Rainfall in West Bengal Using Ensemble Learning Approaches — 西孟加拉 19 个区的月雨量长期预测（9 年）。分层框架：先用回归预测年度汇总特征（年总量、季度占比、变率、偏度、极值），再把它们作为辅助输入交给 MLP 预测月值。
+- 2510.15011 Data-driven Calibration Sample Selection and Forecast Combination in Electricity Price Forecasting: An Applica — 电价预测：对每个目标日，用 kNN 在外生变量空间中选最相似的历史日作为 ARX 的标定样本（也有 WLS 距离加权版本），用验证窗口挑 k，再把多个 k 的预测做平均；与多标定窗口平均等基准比较 RMSE 和交易收益。
+- 2510.15101 Operator Flow Matching for Timeseries Forecasting — TempO：在潜空间做流匹配、逐步预测下一帧的PDE时空预报器。速度场回归器是时间条件FNO（channel folding），条件用RIVER式稀疏条件（最近帧+随机一帧历史帧+偏移Δ），目标是长时域滚动稳定且参数轻量。
+- 2510.15978 DAWP: A framework for global observation forecasting via Data Assimilation and Weather Prediction in satellite — 直接在卫星观测空间做全球预报：先用掩码多模态MAE（AIDA）补全不规则的卫星观测，再用时空解耦transformer按子图预报，通过跨区域边界条件（CBC）从全局缓存取邻块做条件。
+- 2510.19110 Signature Kernel Scoring Rule: A Spatio-Temporal Diagnostic for Probabilistic Weather Forecasting — 提出一个评分规则：把整条预报轨迹当作连续路径，算签名核（signature kernel），它是严格 proper 的，既能拿来评估概率天气预报的时空相关结构，也能用多成员集合训练生成网络（ERA5 Z500，64x32）。
+- 2510.20228 Sparse Local Implicit Image Function for sub-km Weather Downscaling — SpLIIF：把稀疏站点观测（可学习IDW）和地形编码成潜特征，用 LIIF 隐式函数在任意坐标解码，做亚公里温度/风降尺度。
+- 2510.20807 Video Prediction of Dynamic Physical Simulations With Pixel-Space Spatiotemporal Transformers (PSViT) — 纯 Transformer 在像素空间做自回归视频预测（U-Net 式 patch merge，全局空间注意力 + 同位置因果时间注意力）。在物理仿真视频上，比潜空间方法更晚出现物体轨迹偏离。
+- 2510.21249 Forecast reconciliation with non-linear constraints — 把预报一致化（reconciliation）推广到非线性约束（如比率、死亡率=死亡/暴露）：把不一致的基础预报按加权最小二乘投影到约束流形上，并给出投影能保证提升精度的充分条件。
+- 2510.22094 Hierarchical Graph Networks for Accurate Weather Forecasting via Lightweight Training — 层次GNN全球中期预报（HiFlowCast/HiAntFlow）：用 Latent-Memory-Retention 在下行路径保留上行路径的全局趋势，用 Latent-to-Physics 分支在各层级融合物理强迫并输出；借已有预训练权
+- 2510.22855 A Review of Neural Networks in Precipitation Prediction — 降水预测神经网络综述：覆盖 ANN、CNN、RNN、生成模型、Transformer、GNN 和混合模型，以及常用损失、数据集与评估指标；指出极端降水、数据不平衡、物理一致性是主要挑战。
+- 2510.23662 JiuTian Chuanliu: A Large Spatiotemporal Model for General-purpose Dynamic Urban Sensing — 基于运营商信令的人口流动动态图大模型：连续时间动态图编码加自回归自监督，学通用的人和区域嵌入，服务城市感知下游任务。
+- 2510.24254 Forecasting precipitation in the Arctic using probabilistic machine learning informed by causal climate driver — 北极两站点降水预测：先用小波相干和 SURD 因果分解筛选气象驱动因子，再用 boosting 预测器，最后用 conformal prediction 给出校准后的区间。
+- 2510.24943 Radar DataTree: A FAIR and Cloud-Native Framework for Scalable Weather Radar Archives — 数据基础设施论文：把分散的业务雷达体扫文件（FM-301/CfRadial 2.1）用 xarray.DataTree 按时间组织成层级结构，存为 Zarr+Icechunk 云原生档案，用 QVP 生成和降水累积两个工作流做并行性能基准。
+- 2510.26099 SAFE: A Novel Approach to AI Weather Evaluation through Stratified Assessments of Forecasts over Earth — 开源评估包，按国家、区域、收入、陆海把 AI 天气模型的 RMSE 分层，并定义“公平性”指标（各层 RMSE 最大差、各层方差），揭示全局平均指标掩盖的分层差异。
+- 2510.26601 ResMatching: Noise-Resilient Computational Super-Resolution via Guided Conditional Flow Matching — 显微图像超分：以低分辨率图为条件的标准条件流匹配（高斯源），从隐式后验采样，用多样本做 MMSE 估计，并对像素级不确定性做线性校准。
+- 2510.26645 Curly Flow Matching for Learning Non-gradient Field Dynamics — Curly-FM：解带非零漂移参考过程的薛定谔桥，用观测到的近似速度场定义参考漂移，学习弯曲的神经插值路径，从而能学到周期性、非梯度场的轨迹（单细胞、CFD、洋流）。
+- 2510.27066 AI-boosted rare event sampling to characterize extreme weather — 用快速 AI 模拟器的集合预报作为得分函数，驱动物理 GCM（PlaSim）的稀有事件采样（克隆/淘汰 walker），以约百分之一的代价得到千年一遇热浪的无偏统计。
+- 2510.27364 Fine-Tuning Open Video Generators for Cinematic Scene Synthesis: A Small-Data Pipeline with LoRA and Wan2.1 I2 — 在约 40 段影视短片上给 Wan2.1 I2V-14B 做 LoRA 微调，实现风格化视频生成的小数据工程流程。
+- 2510.27456 Bias correction of satellite and reanalysis products for daily rainfall occurrence and intensity — 在加纳/赞比亚 38 个站点上比较 LOCI、QM、SVR、GPR 对 7 种卫星/再分析日降水产品的偏差订正，提出带上限的 LOCI；结论是订正后强/极端雨的检出率普遍仍然很低。
+- 2511.00049 Adaptive Spatio-Temporal Graphs with Self-Supervised Pretraining for Multi-Horizon Weather Forecasting — 在 ERA5/MERRA-2 再分析资料上做多时效站点天气预报：GNN 加自监督预训练、对比损失、时空一致性正则。方法描述含糊。
+- 2511.02205 OmniField: Conditioned Neural Fields for Robust Multimodal Spatiotemporal Learning — 面向稀疏、不规则、带噪的多模态观测，做条件神经场的统一重建、插值和预报：高斯傅里叶特征、正弦初始化查询、跨模态迭代精修（ICMR）。
+- 2511.05179 Evaluating Spatio-Temporal Forecasting Trade-offs Between Graph Neural Networks and Foundation Models — 在无线传感网温度预测上比较 VAR/GRU/Transformer/STGNN 与时序基础模型（Chronos、Moirai、TimesFM），考察传感器空间密度和采样间隔的影响；结论是稀疏部署时 STGNN 占优，多变量 TSFM Moi
+- 2511.07732 ViPRA: Video Prediction for Robot Actions — 用视频-语言模型在无动作标签的视频上联合预测未来帧和潜在动作 token，再用分块流匹配解码器把潜在动作映射成机器人的连续控制。
+- 2511.08168 oboro: Text-to-Image Synthesis on Limited Data using Flow-based Diffusion Transformer with MMH Attention — 日本 GENIAC 项目的文生图基础模型技术报告：用版权清洁的有限数据从零训练 DiT+I-CFM，逐块改变注意力头数（MMH）。
+- 2511.11152 Deep Learning for Short-Term Precipitation Prediction in Four Major Indian Cities: A ConvLSTM Approach with Ex — 用 ERA5 多变量再分析驱动 TimeDistributed-CNN + ConvLSTM，预测印度四城市的日降水，并用 Grad-CAM、置换重要性、时间步遮挡和反事实扰动做可解释性分析。
+- 2511.11185 A Comparison of Lightweight Deep Learning Models for Particulate-Matter Nowcasting in the Indian Subcontinent  — Weather4Cast 2025 污染任务的参赛报告：用 CAMS 分析场 10 通道、256×256 输入预测中心 128×128 区域 6 小时后的 PM，比较 ConvGRU、ConvLSTM、U-Net 与 Aurora。
+- 2511.14753 SparseST: Exploiting Data Sparsity in Spatiotemporal Modeling and Prediction — 利用空间稀疏（稀疏卷积）和时间差分稀疏（Delta Network 阈值）给 ConvLSTM 降计算量，用多目标损失给出精度与加速比的 Pareto 折中。
+- 2511.16484 Flow and Depth Assisted Video Prediction with Latent Transformer — 在 VQ 潜空间多目标 latent transformer（SCAT）的视频预测中，把点跟踪流（Co-tracker）和深度图（DepthAnything v2）当作额外模态输入，改善遮挡场景和背景运动的预测。
+- 2511.16924 CBMA: Improving conformal prediction through Bayesian model averaging — 把多个贝叶斯模型的全保形（full conformal Bayes）一致性分数按 BMA 后验权重合并，在模型可能误设时得到效率趋于最优的保形预测集。
+- 2511.17176 On the Predictive Skill of Artificial Intelligence-based Weather Models for Extreme Events using Uncertainty Q — 检验对确定性全球 AI 天气模型（FuXi/GraphCast/SFNO）的初始场加扰动（Gaussian、Perlin、HCBV、HENS 繁殖向量）能否做出有用的极端事件集合；结论：扰动方法影响很小，模型本身才是主因，降水极端明显比温度
+- 2511.17888 MINDiff: Mask-Integrated Negative Attention for Controlling Overfitting in Text-to-Image Personalization — 推理期在交叉注意力里减去带背景掩码的“主体负注意力”，缓解 DreamBooth 个性化微调的过拟合。
+- 2511.18060 An operator splitting analysis of Wasserstein–Fisher–Rao gradient flows — 分析 Wasserstein（输运/扩散）流和 Fisher–Rao（生灭/反应）流做 Lie–Trotter 分裂时顺序的影响，证明合适的顺序和步长下，分裂格式对目标分布的收敛可以快于精确的WFR流。
+- 2511.19075 Structured Matching via Cost-Regularized Unbalanced Optimal Transport — 提出可学习地面代价的UOT（CR-UOT）：允许质量创建和删除，同时对代价做凸正则（用线性变换参数化的内积代价 c_A(x,y)=−⟨Ax,y⟩），用块坐标下降求解，用于跨空间的单细胞多组学对齐。
+- 2511.19229 Learning Plug-and-play Memory for Guiding Video Diffusion Models — 检索参考视频，经 3D CNN、低/高通滤波和自注意力编码成记忆 token，拼进冻结 DiT（Wan2.1/2.2）的自注意力，引导生成更符合物理规律。
+- 2511.20123 UltraViCo: Breaking Extrapolation Limits in Video Diffusion Transformers — 要解决视频 DiT 生成长度超过训练长度时出现的周期重复和画质退化。作者归因为"注意力分散"，给出免训练的修正：对训练窗口外的 token 把注意力 logit 乘一个常数衰减因子 α（<1）。
+- 2511.21592 MoGAN: Improving Motion Quality in Video Diffusion via Few-Step Motion Adversarial Post-Training — 扩散 MSE 目标不直接监督运动，导致抖动、鬼影；少步蒸馏（DMD）后运动又偏静止。做法是在 3 步蒸馏生成器上加光流空间的对抗后训练：冻结 RAFT 提取光流，DiT 判别器区分真/假运动序列，并用 DMD 分布匹配和 R1/R2 正则保
+- 2511.23043 High-Resolution Probabilistic Data-Driven Weather Modeling with a Stretched-Grid — Bris：在全球拉伸网格上（北欧 2.5 km）用潜空间噪声注入加 almost-fair CRPS（格点 CRPS 加谱 CRPS）训练的随机 GNN 集合模型，用于缓解 MSE 双重惩罚造成的平滑。
+- 2512.00366 S^2-KD: Semantic-Spectral Knowledge Distillation Spatiotemporal Forecasting — 用 LMM 生成的文本当特权信息训练一个多模态教师，再通过“中间表示 MSE 对齐 + 特征 FFT 幅值 L1 对齐”蒸馏给只看图像的轻量学生，让小模型接近大教师。
+- 2512.01400 On Global Applicability and Location Transferability of Generative Deep Learning Models for Precipitation Down — 用 ERA5→IMERG 的 WGAN 降尺度，在全球 15 个区域做分层的训练/评估划分，考察生成式降尺度跨地域的迁移性和地形静态特征的作用。
+- 2512.02268 Spatiotemporal Pyramid Flow Matching for Climate Emulation — 把流匹配轨迹切成时空金字塔：从粗时间尺度、低分辨率逐级升到细时间尺度、高分辨率，可以在任意时间尺度上直接并行采样，用于气候模拟（ClimateBench）。
+- 2512.04566 Reliable Statistical Guarantees for Conformal Predictors with Small Datasets — 指出小校准集下 split-conformal 只有边际覆盖率保证，单个预测器的实际覆盖率分散很大。利用覆盖率服从 Beta(m,N_cal−m+1)，改为按“单个预测器覆盖率 ≥1−α 的概率 ≥1−δ”来选分位秩，并提供开源实现。
+- 2512.05469 How Ensemble Learning Balances Accuracy and Overfitting: A Bias-Variance Perspective on Tabular Data — 在 4 个表格分类数据集上，用 5 种子重复分层交叉验证和 Wilcoxon 检验比较单模型与 9 种集成，从偏差-方差和数据复杂度指标解释集成何时有效。结论：近线性数据上集成无显著增益，非线性数据上显著，噪声或不平衡数据上需谨慎正则。
+- 2512.05635 Experts-Guided Unbalanced Optimal Transport for ISP Learning from Unpaired and/or Paired Data — 用 UOTM 半对偶非平衡 OT 对抗目标，加上颜色/结构/频率三个专家判别器，训练任意 ISP 网络（raw→sRGB），配对和非配对都能用，并且对离群样本鲁棒。
+- 2512.09250 A Benamou-Brenier Proximal Splitting Method for Constrained Unbalanced Optimal Transport — 为带仿射等式/不等式约束的动态 WFR 非平衡最优输运（约束可以作用在密度、动量或源项上）给出适定性证明和有限差分加并行近端（PPXA）数值解法。
+- 2512.09687 Unconsciously Forget: Mitigating Memorization; Without Knowing What is being Memorized — UniForget：假设记忆内容集中在少量参数(FFN/Norm)。在 FLUX 上学可松弛掩码剪枝，只在“中性”提示上蒸馏原模型采样输出并加 L1 稀疏，就能在不指定概念的情况下抑制版权内容再现，需要时再全参重训恢复质量。
+- 2512.11127 Refining Graphical Neural Network Predictions Using Flow Matching for Optimal Power Flow with Constraint-Satis — DC-OPF 两阶段求解：先用物理约束 GNN 给出确定性可行初值，再把这个初值当作 CFM 的源点，学习一个速度场把解推向最优，每个 Euler 步后做硬投影保证可行。
+- 2512.11203 AutoRefiner: Improving Autoregressive Video Diffusion Models via Reflective Refinement Over the Stochastic Sam — 给冻结的自回归视频扩散模型挂一个 LoRA 噪声精修器，精修的是随机采样路径上中间步注入的噪声（不是初始噪声），用 DMD 或奖励作训练目标，提高生成保真度。
+- 2512.11293 Autoregressive Video Autoencoder with Decoupled Temporal and Spatial Context — 想解决视频 VAE 把时空信息纠缠在一起、参数和数据量都很大的问题。做法是逐帧自回归编解码：潜变量分成下采样运动场（把上一帧 warp 过来）和空间补充（新出现内容的残差），外加跨帧状态特征和逐步加长序列的训练。
+- 2512.12080 BAgger: Backwards Aggregation for Mitigating Drift in Autoregressive Video Diffusion Models — 要解决自回归视频扩散的曝光偏差（漂移）。做法是用模型自己的 rollout 生成视频，再时间反转，当作"从漂移状态恢复"的纠错轨迹；按 DAgger 方式多轮聚合，用原始扩散目标微调，不需要教师或分布匹配。
+- 2512.13899 Winter Precipitation Type Diagnosis and Uncertainty Quantification with a Physically Consistent Machine Learni — 用证据深度学习（Dirichlet 输出）的全连接网络，从 RAP 垂直热力廓线诊断四类冬季降水类型并给出认知不确定性，训练数据是经物理质控的 mPING 众包观测。
+- 2512.13910 Exploring Machine Learning, Deep Learning, and Explainable AI Methods for Seasonal Precipitation Prediction in — 在 GPCP 2.5° 数据上比较 RF、XGBoost、CNN1D、LSTM、GRU 与动力模式 BAM 的南美季节降水预测，LSTM 的 MSE 最低，XGBoost 延迟最低，并用 SHAP 解释。
+- 2512.15222 Huayu: Advanced Real-Time Precipitation Estimation from Geostationary Satellite — 只用风云-4B AGRI 红外 7 通道，以 IMERG Final Run 为标签，训练一个 241.78M 参数的实时降水反演模型。对站点检验 CSI 0.693，略高于 IMERG FR 的 0.670。
+- 2512.16967 Physics-Informed Lightweight Machine Learning for Aviation Visibility Nowcasting Across Multiple Climatic Regi — 用 XGBoost 加 14 个物理导出的 METAR 表格特征（露点差、降温率、能见度滞后等），在 11 个机场做 0–6 h 低能见度事件临近预报，并与人工 TAF 对比。
+- 2512.17098 Predictive Modeling of Maritime Radar Data Using Transformer Architecture — 这是一篇综述，讨论船用航海雷达（X 波段、MOANA 数据集）帧预测与 AIS 轨迹预测的方法谱系。结论只是"还没有人用 Transformer 做航海雷达帧预测"。不涉及降水、气象，也没有新方法或实验。
+- 2512.17878 Weighted Stochastic Differential Equation to Implement Wasserstein-Fisher-Rao Gradient Flow — 纯理论：给扩散采样加 Fisher–Rao 质量重加权（反应项），用 Feynman–Kac 表示实现成加权 SDE，目的是改善多模态目标上的混合速度。
+- 2512.18289 A Neural-Network Model-Measurement-Based Observation Operator For Weather Radar Reflectivity Assimilation — 用 ResUNet 把 ALADIN 模式的温湿风压场映射成雷达反射率，作为 3DVar 同化的可微观测算子。统计评估显示它对弱到中等回波尚可，但 >40 dBZ 的 POD 接近 0。
+- 2512.21004 Learning from Next-Frame Prediction: Autoregressive Video Modeling Encodes Effective Representations — 做视觉表征预训练（NExT-Vid）：用掩码后的上下文帧预测下一帧的条件表征，再由条件流匹配解码器生成下一帧的 VAE 潜变量。评价指标是冻结编码器后的分类探针精度，不是预测质量。
+- 2512.21435 Dynamic Attention (DynAttn): Interpretable High-Dimensional Spatio-Temporal Forecasting (with Application to C — 用弹性网特征门控、权重共享的小型自注意力编码器和零膨胀负二项（ZINB）似然头，预测稀疏、突发的冲突死亡计数（国家级和 PRIO 网格级，1–12 个月），同时输出期望值和超阈概率。
+- 2512.24440 Towards mechanistic understanding in a data-driven weather model: internal activations reveal interpretable ph — 在GraphCast中间层激活上训练k-稀疏自编码器(SAE)，找到对应热带气旋、大气河、日/季循环、降水型等的可解释特征；并通过稀疏修改特征激活，对飓风做出物理一致的干预
+- 2601.00172 Sequential Reservoir Computing for Efficient High-Dimensional Spatiotemporal Forecasting — 把大储备池拆成多个串联的小储备池，拼接各级状态后用闭式岭回归读出，在高维时空系统上以极低训练成本获得更长的有效预报时长。
+- 2601.01813 Spatio-temporal modeling and forecasting with Fourier neural operators — 把 FNO 作为统计动态时空模型的过程算子，加上异方差的高斯过程噪声项做不确定性量化，用于 Burgers 模拟、大西洋 SST 和欧洲站点降水（kriging 到网格）预报。
+- 2601.02445 A Spatio-Temporal Deep Learning Approach For High-Resolution Gridded Monsoon Prediction — 用 3D-CNN（残差块、时间维坍缩、GAP、全连接回归头），从 1–5 月 ERA5 多变量场预测印度夏季风 6–9 月格点降水，属于季节尺度。
+- 2601.05219 CAOS: Conformal Aggregation of One-Shot Predictors — 每个标注样本诱导一个 one-shot 预测器（基于基础模型的 patch 相似度）。CAOS 对这些预测器做保形聚合：对候选输出取 k 个最小非一致性分数之和，并用留一校准，在不切分数据的前提下得到有效覆盖和更小的预测集。
+- 2601.08350 A parsimonious tail compliant multiscale statistical model for aggregated rainfall — Uses the extended generalized Pareto distribution (EGPD) with compound Poisson aggregation (Panjer algorithm) to model t
+- 2601.11827 Shortest-Path Flow Matching with Mixture-Conditioned Bases for OOD Generalization to Unseen Conditions — 条件流匹配难以外推到未见条件（药物、扰动、旋转角等）。SP-FM 把源分布改成随条件变化的可学习高斯混合，并用最短路径（OT）流匹配训练，使相似条件有相似起点，流只需修正残差。
+- 2601.14794 RANDSMAPs: Random-Feature/multi-Scale Neural Decoders with Mass Preservation — 用随机特征或多尺度解码器解决流形学习的逆像问题，通过带 Lagrange 约束的闭式最小二乘严格保证重构的总质量守恒（和为一）。
+- 2601.16933 Reward-Forcing: Autoregressive Video Generation with Reward Feedback — 把双向视频扩散(Wan2.1)改造成自回归模型时，不走DMD教师蒸馏，而是先用教师ODE轨迹回归初始化，再对末帧用可微ImageReward奖励微调。
+- 2601.17636 HealDA: Highlighting the importance of initial errors in end-to-end AI weather forecasts — 基于 ML 的全球资料同化（卫星加常规观测直接映射到 HEALPix 1° 状态），给现成 AI 预报模型做初值；发现技巧差距主要来自初值误差，而初值误差源于大尺度上的过拟合。
+- 2601.19488 Entropy-Guided k-Guard Sampling for Long-Horizon Autoregressive Video Generation — 离散VQ-token自回归视频生成中，固定top-k/top-p采样会在低不确定区引入多余噪声、在高不确定区卡死在早期错误并随帧累积；提出按每个token预测分布的熵自适应调节候选集大小，并设最小候选数(k-guard)保底，免训练。
+- 2601.19552 Generalizable Equivariant Diffusion Models for Non-Abelian Lattice Gauge Theory — Gauge-equivariant diffusion models (L-CNN) with Metropolis-adjusted annealed Langevin sampling for 2D U(2)/SU(2) lattice
+- 2601.21004 A Tolerance-Based Framework for Spatio-Temporal Forecast Validation Using the gamma-Index — Brings the 3D γ-index from medical dose verification to spatio-temporal forecast verification. With spatial (DTA), tempo
+- 2601.23072 SplineFlow: Flow Matching for Dynamical Systems with B-Spline Interpolants — 在多个观测时刻之间用 B 样条（而不是分段线性）构造流匹配的条件路径和速度，更好地拟合高阶、非规则采样的 ODE/SDE 动力学和细胞轨迹。
+- 2602.00240 Green-NAS: A Global-Scale Multi-Objective Neural Architecture Search for Robust and Efficient Edge-Native Weat — 用NSGA-II多目标NAS（精度、参数量、深度）在24个城市的小时级站点多变量时间序列上，搜轻量预报模型的Pareto前沿；再做跨城市迁移学习，并用split conformal给预测区间
+- 2602.01194 EMFormer: Efficient Multi-Scale Transformer for Accumulative Context Weather Forecasting — 全球中期预报的三件套：注意力前加多尺度卷积（1/3/5核融合为单个卷积，梯度分开）；带KV缓存剪枝的累积上下文微调，缓解长滚动误差累积；可学习正弦加权的复合损失
+- 2602.01329 FlowCast: Trajectory Forecasting for Scalable Zero-Cost Speculative Flow Matching — 免训练的 FM 采样加速：用上一步速度外推作为“草稿”，与实际速度的 MSE 低于阈值 ε 就跳过网络评估，加速超过 2.5×。与我方 FlowCast 系雷达模型只是同名，并无关系。
+- 2602.01436 MSWEP V3: Machine Learning-Powered Global Precipitation Estimates at 0.1$^\circ$ Hourly Resolution (1979-Prese — 用18组XGB/RF模型栈融合卫星与再分析降水、气温等预测量，经雨量计训练和最优插值(OI)校正，生成1979年至今的全球0.1°逐时降水估计产品（不是预报）
+- 2602.03166 Event-Level Probabilistic Prediction of Extreme Rainfall over India Using Physics-Gated Latent Dynamics — 用 ERA5 大尺度场预测印度季风期日极端降水（局地 P95）：潜变量 Neural ODE 的演化速率由 CAPE/ω500 门控调制，再加极值加权 MSE。结果：像素 CSI 仍低于持续性预报，32×32 tile 级 CSI 高。
+- 2602.03609 Scalable non-separable spatio-temporal Gaussian process models for large-scale short-term weather prediction — 用可扩展的非可分时空高斯过程做美国约3000个站点的日最高温和日降水1–3天预报。方法上提出相关性邻居选择、时空kMeans++诱导点和GPU加速，对比Vecchia、FITC、VIF三类近似
+- 2602.03767 Decision-oriented benchmarking to transform AI weather forecast access: Application to the Indian monsoon — 提出面向决策的AI天气模型评测框架：以印度季风局地起始日期为目标，用MAE、漏报率、虚警率和概率技巧（相对气候态基线）评测6个AIWP模型，并支撑了2025年向3800万农民发布的混合预报
+- 2602.03924 WIND: Weather Inverse Diffusion for Zero-Shot Atmospheric Modeling — 用diffusion forcing预训练一个无条件时空视频扩散先验：逐帧独立噪声，网络不接收噪声级。推理期用MMPS后验采样，把预报、降尺度、稀疏重建、守恒约束都当作零样本逆问题求解，不做任务微调
+- 2602.04928 Euphonium: Steering Video Flow Matching via Process Reward Gradient Guided Stochastic Dynamics — 视频流匹配做在线RL(GRPO)时rollout探索是无方向的；把潜空间过程奖励模型的梯度注入SDE漂移做主动引导，用潜空间PRM+像素ORM双奖励算优势，再把引导蒸馏进流网络，推理时不再需要奖励模型。
+- 2602.06028 Context Forcing: Consistent Autoregressive Video Generation with Long Context — 流式长视频自回归生成中，学生模型有长上下文而监督它的教师只看5秒窗口，两者失配；改用长上下文教师做上下文DMD蒸馏，并配合慢/快记忆缓存和有界位置编码，把有效上下文拉长到20秒以上。
+- 2602.06800 FlowDA: Accurate, Low-Latency Weather Data Assimilation via Flow Matching — 用条件流匹配从背景预报场直接流到分析场，做低延迟生成式数据同化：稀疏观测先经SetConv格点化作条件，再微调Aurora基础模型当速度场
+- 2602.07775 Rolling Sink: Bridging Limited-Horizon Training and Open-Ended Testing in Autoregressive Video Diffusion — 把训练时长以外的自回归rollout退化(颜色过饱和、结构崩溃、运动消失)看作KV缓存的训练/测试行为失配，提出免训练的有界缓存策略(attention sink + 时间重索引 + Rolling Semantics)。
+- 2602.09405 Is Memorization Helpful or Harmful? Prior Information Sets the Threshold — 在过参数化线性模型加一般先验的贝叶斯设定下证明：最优估计的训练误差被夹在 σ⁴/(V_π+σ²) 与 σ⁴/(J_π⁻¹+σ²) 之间。先验有低维结构（如稀疏）时过拟合有害；先验无信息时记忆化是必要的。
+- 2602.12980 MAUNet-Light: A Concise MAUNet Architecture for Bias Correction and Downscaling of Precipitation Estimates — 把Max-Average UNet用于TRMM→IMD的降水偏差校正和IMD降尺度，再用“教师预测→学生→真值再标定”的知识精炼，得到参数约60%的轻量模型
+- 2602.14027 Train Short, Inference Long: Training-free Horizon Extension for Autoregressive Video Generation — 自回归视频扩散外推到训练时长之外时会崩；归因于3D RoPE的频谱偏置和初始噪声缺乏动态先验，提出免训练的FLEX：分频RoPE插值/外推 + 反相噪声采样(ANS) + 推理期attention sink。
+- 2602.15004 PDE foundation models are skillful AI weather emulators for the Martian atmosphere — 把用多 PDE 数值解预训练的 Poseidon/scOT 微调为火星大气模拟器，并从 2D 扩展到 3D。小数据下验证损失提升 34.4%，且能抑制随机初始化时出现的过拟合。
+- 2602.15088 IT-DPC-SRI: A Cloud-Optimized Archive of Italian Radar Precipitation (2010-2025) — 发布意大利民防部全国雷达拼图 SRI 降水强度的 2010–2025 长时档案（1 km，5–15 min，1200×1400 km，Zarr 格式，51 GB），供临近预报和 ML 训练使用。
+- 2602.18146 Stable Long-Horizon Spatiotemporal Prediction on Meshes Using Latent Multiscale Recurrent Graph Neural Network — 增材制造中网格上几千步温度场的长时预测；用变分图自编码器压到潜空间，再用两个分别工作在粗/细时间尺度、各自独立训练的潜空间循环GNN耦合预测，以求稳定。
+- 2602.18794 Statistical Error Bounds for Generative Solvers of Chaotic PDEs: Wasserstein Stability, Generalization, and Tu — 纯数学理论：把流匹配/扩散类生成式PDE预报器看作作用在概率律上的Markov算子，给出W2稳定性、一步误差分解（可分辨失配+高频覆盖尾）与多步rollout的Grönwall界，并在Euler湍流统计解框架下证明极限辨识；全文无数值实验。
+- 2602.19915 Fully Convolutional Spatiotemporal Learning for Microstructure Evolution Prediction — 把SimVPv2(门控时空注意gSTA、全卷积、非循环)直接用于相场模拟的晶粒生长和旋节分解序列预测(10帧→90帧)，强调比PredRNN++/ConvLSTM快。
+- 2602.23146 Partial recovery of meter-scale surface weather — 模型 Marmot 融合稀疏气象站、30 m 地表遥感（Sentinel-2/DEM/土地覆盖/地学基础模型嵌入）和 ERA5，推断 30 m 分辨率的近地面温度、露点和风。
+- 2603.00133 You Don't Need All That Attention: Surgical Memorization Mitigation in Text-to-Image Diffusion Models — 推理期缓解文生图扩散的训练图复刻：用吸引-排斥式对比引导（GUARD）远离“被记住的”条件预测，同时逐 prompt 用统计离群检测找出交叉注意力的尖峰位置，并衰减这些位置的注意力 logit。
+- 2603.00140 Steering Away from Memorization: Reachability-Constrained Reinforcement Learning for Text-to-Image Diffusion — 把去噪过程看作动力系统，用可达性分析近似“必然走向记忆化样本”的后向可达管，再用约束 RL（SAC）学习在条件嵌入上施加最小扰动，把轨迹引离记忆化区域。
+- 2603.00259 Data-driven, non-Markovian modelling of weather in the presence of non-stationary, non-Gaussian, and heteroske — 研究对象是单站（Boulder）温度时间序列：按年周期分季，用局部同方差性判定伪平稳段，再用广义主方程构建低维非马尔可夫随机模型。
+- 2603.03700 Generalization Properties of Score-matching Diffusion Models for Intrinsically Low-dimensional Data — 理论：给出score-based扩散在有限样本下的Wasserstein-p误差界，收敛速率约为n^{-1/d*}，只依赖数据的(p,q)-Wasserstein内在维度而非环境维度；配一个小实验（BigGAN合成d=10/100的流形数据
+- 2603.06782 Physics-Informed Diffusion Model for Generating Synthetic Extreme Rare Weather Events Data — 用按上下文类别（洋盆、发展阶段、平均风速）条件化的 Context-UNet DDPM 生成 16×16 的热带气旋卫星风场切片，给极稀有类（202/140514）扩充样本。所谓 physics-informed 其实只是上下文条件，损失就
+- 2603.10410 Effective Dataset Distillation for Spatio-Temporal Forecasting with Bi-dimensional Compression — STemDist 在时间和空间两个维度同时压缩时空序列数据集（位置编码器、簇级蒸馏、子集粒度蒸馏），目的是加快训练、省显存，方向是把大数据变小，和我们小数据、记忆化的问题正好相反。
+- 2603.12725 Graph In-Context Operator Networks for Generalizable Spatiotemporal Prediction — 在相同数据和步数下比较上下文算子学习与单算子学习（空气质量站点图），发现多 Δt 算子多样性训练更不容易过拟合，并能利用检索到的示例。
+- 2603.13070 Mitigating Memorization in Text-to-Image Diffusion via Region-Aware Prompt Augmentation and Multimodal Copy De — 文生图扩散的防复制工作：训练时用检测器生成的区域感知提示词变体做条件增强（RAPTA），降低对训练图文对的记忆；另提出融合ViT/CLIP/纹理三路特征的复制检测器ADMCD。
+- 2603.13928 Discriminative Flow Matching Via Local Generative Predictors — 把分类和检测改写成条件流匹配的输运问题：在共享骨干上挂多个独立的局部流预测头（逐块局部FM损失、不做全局反传），推理时聚合各头预测，用单步集成推理替代静态投影。
+- 2603.13930 Spatially Varying Coefficient Mallows Model Averaging — 用 Mallows 型准则 C_n(w)=‖Y−μ̂(w)‖²+2tr(P(w)Ω) 给一组空间变系数（GWR 类）候选模型选全局平均权重，并证明渐近最优和权重一致性。注意权重本身是全局标量，不随空间变化，和分拣理由的设想不同。
+- 2603.14845 Integrating Weather Foundation Model and Satellite to Enable Fine-Grained Solar Irradiance Forecasting — Baguan-solar 用两阶段 Swin 框架：以交叉注意力融合天气基础模型 Baguan 的预报与 Himawari 卫星图，先预报云量等昼夜连续的中间量，再推断地表辐照度，给出 24h 公里级辐照预报。
+- 2603.15127 A Data-Driven Regional Model for Skillful Medium-Range Typhoon Prediction — 区域 AI 台风预报 HITS：用 AIFS 的大尺度未来场通过 cross-attention 约束区域自回归模型，再加 LPIPS 感知损失，减轻强对流/雨带过度平滑、提升 >40 dBZ 组合反射率技巧。
+- 2603.15260 AGCD: Agent-Guided Cross-Modal Decoding for Weather Forecasting — 用多智能体 MLLM 为当前大气状态生成文本'物理先验'，经区域多尺度 token + Hopfield 池化 + 门控 cross-attention 在解码期注入任意预报骨干，降低 WeatherBench 6h 误差与 48h rol
+- 2603.15358 FuXiWeather2: Learning accurate atmospheric state estimation for operational global weather forecasting — 端到端神经同化+预报系统，用观测与再分析联合监督、递归展开训练消除训练/部署背景场分布差（exposure bias），并混合真实与模拟观测训练，输出 0.25° 分析场与 10 天预报。
+- 2603.15627 Physics-Informed Video Diffusion For Shallow Water Equations — 在预训练 OpenSora 上微调 DiT，给定初始物理状态和地形，联合生成渲染视频与浅水方程物理状态。
+- 2603.16429 LenghuSky-8: An 8-Year All-Sky Cloud Dataset with Star-Aware Masks and Alt-Az Calibration for Segmentation and — 天文台全天空云图 8 年数据集，用 DINOv3 线性探针分割，并附带一个三类 logit 下一帧预报基准；ConvLSTM 相比持续性只好一点点。
+- 2603.19865 On the Dynamics & Transferability of Latent Generalization during Memorization — 在标签被打乱（label noise）的分类记忆化设置下，追踪中间层“潜在泛化”能力（MASC探针或新设计的线性探针可读出）在训练中的动态：它在训练早期达峰；并用线性探针直接改写末层权重，把潜在泛化转成模型的实际泛化。
+- 2603.20250 Developing Machine Learning-Based Watch-to-Warning Severe Weather Guidance from the Warn-on-Forecast System — 用 WoFS 集合预报输出训练 HGBT 与 U-Net，给出 2–6 小时强天气（冰雹/大风/龙卷）概率指导，优于 UH 邻域集合概率基线。
+- 2603.20468 Three-Dimensional Variational Data Assimilation with Rapid Update Cycling for Short-Range Precipitation Foreca — WRF+WRFDA 3D-Var 同化地面站观测，比较 1/3/6/12 小时循环间隔对巴厘岛一次暴雨短时降水预报的影响，1 小时循环最好。
+- 2603.20584 Improving Diffusion Generalization with Weak-to-Strong Segmented Guidance — 从“弱到强”视角比较CFG（条件相关引导）与AutoGuidance/SLG（条件无关引导）各自有效的噪声区间，提出分段引导SGG（高噪声段用CFG，低噪声段用条件无关引导），并把引导项蒸进训练目标，提高不加引导时的生成质量。
+- 2603.21284 Sonny: Breaking the Compute Wall in Medium-Range Weather Forecasting — 20.5M 参数的分层 Transformer（StepsNet：先窄慢路径处理动力变量，再全宽快路径融合热力变量），随机时距 Δt∈{6,12,24}h 预测增量，训练期用 EMA 替代 rollout 微调，单卡 A40 训练 5.5 
+- 2603.21856 Climate Prompting: Generating the Madden-Julian Oscillation using Video Diffusion and Low-Dimensional Conditio — 在 ERA5 上训练视频扩散模型，用 RMM 主成分、季节、ENSO 等低维指数作为提示生成长 MJO 序列，做反事实归因（目的是生成而不是预报）。
+- 2603.25936 Do Climate Models Need Microphysical and Convective Parameterizations to Generate Accurate Precipitation Field — 用 U-Net 从 13 个 ERA5 场诊断 3 小时降水（目标为 ERA5 或 IMERG），检验能否绕过微物理/对流参数化，并改善极端降水与日变化。
+- 2603.26704 Deep Learning Multi-Horizon Irradiance Nowcasting: A Comparative Evaluation of Three Methods for Leveraging Sk — 比较三种把全天空图像输入 LSTM 做 GHI 辐照度点预报的方式，发现在小数据（29 天）下，把工程特征聚合成时间序列比 CNN 从原图或特征图提取特征更好。
+- 2603.27288 StretchCast: Global-Regional AI Weather Forecasting on Stretched Cubed-Sphere Mesh — 在可变分辨率的拉伸立方球网格上做全球-区域 AI 预报（粗分辨率概念验证），并测试一次输出 4 帧的联合多步训练。
+- 2603.28173 Skillful Kilometer-Scale Regional Weather Forecasting via Global and Regional Coupling — 用冻结的预训练全球模型和从头训练的区域高分辨网络做 5km/1h 区域预报。两者通过 ScaleMixer 双向耦合：自适应选出关键位置，再做两段式交叉注意力。
+- 2603.29407 Hybrid Quantum-Classical Spatiotemporal Forecasting for 3D Cloud Fields — 在 SimVP 式编解码器中间插入模拟量子线路的全局耦合模块和门控 LSTM 融合单元，由 5 帧预报 CMA-MESO 三维云场的后 2 帧，报告 CSI/HSS/POD。
+- 2604.01454 Assessing the ability of a stretched-grid deep-learning weather prediction model to capture physical balances — 以风暴 Poly 为个例，诊断 MetNorway 拉伸网格 DLWP 模型 Bris 的物理平衡。结论：RMSE 好看，但大尺度过平滑和细尺度噪声同时存在，破坏了地转等平衡。
+- 2604.01761 Control-DINO: Feature Space Conditioning for Controllable Image-to-Video Diffusion — 给冻结的预训练图生视频扩散模型（Wan 系）加 ControlNet 式零初始化残差适配器，以 DINOv3 稠密特征作结构/语义条件；训练时条件取自原视频、去噪目标取外观增广版本，从而把外观与结构解耦。用于风格迁移和 3D 转视频。
+- 2604.04453 Generative modeling of granular flow on inclined planes using conditional flow matching — 用 CFM 生成先验、可微代理前向算子和稀疏感知梯度引导，从稀疏边界观测反演颗粒流内部速度场。
+- 2604.05068 Towards Scaling Law Analysis For Spatiotemporal Weather Data — 在 ERA5 全球自回归 Swin 模型上分析参数/数据/算力的 scaling law 随预报时效和通道的异质性，发现池化指标的拟合好看，但掩盖了分通道、长时效的退化。
+- 2604.06155 Toward Consistent World Models with Multi-Token Prediction and Latent Semantic Enhancement — 研究 LLM 世界模型：多 token 预测（MTP）通过梯度耦合诱导表示收缩，但会产生违反环境约束的结构幻觉。LSE-MTP 加入 k 步潜状态一致性损失和语义锚定损失（推理时丢弃）来缓解。
+- 2604.06939 Grounded Forcing: Bridging Time-Independent Semantics and Proximal Dynamics in Autoregressive Video Synthesis — 分钟级自回归流式文生视频，基于 Self-Forcing 系。三个部件：双记忆 KV cache（全局语义锚加局部近邻窗口）、双参考 RoPE 注入（把位置限制在训练范围内）、prompt 切换时按邻近度加权的重缓存。用于缓解语义遗忘和位置
+- 2604.07991 MotionScape: A Motion-Stratified UAV Video Benchmark for World Modeling and Future Video Generation — 无人机第一视角未来视频生成基准，228 个片段。按未来目标段的光流运动强度把片段分为低/中/高三层分别报告，显示所有基线随运动强度上升明显退化。
+- 2604.08338 Controlling the rain fall statistics using Mean-Reverting Jump Diffusion model — 用均值回复跳扩散随机微分方程模拟单站半小时降水时间序列，复现间歇性、超扩散（指数约 1.8）、概率分布和多重分形特征，并通过调参控制 Log-Normal↔Gamma 的转换、极端事件频率和干期长度。
+- 2604.09058 PDE-regularized Dynamics-informed Diffusion with Uncertainty-aware Filtering for Long-Horizon Dynamics — 在 DYffusion 上给插值器加 Matérn 型 PDE 平滑正则，并给预报器加 UKF sigma 点协方差负对数似然，以抑制长时程迭代的误差累积。
+- 2604.10328 A Diffusion-Contrastive Graph Neural Network with Virtual Nodes for Wind Nowcasting in Unobserved Regions — 在站点图中加入无观测的'虚拟节点'，用 PPR 图扩散把信息从真实站点传到虚拟节点，并用 MoCo 对比学习（多步/掩码增强）自监督虚拟节点，实现无站点区域风速风向临近预报。
+- 2604.10890 Forecasting Return Time of Extreme Precipitation by Large Deviation Theory — 用 Landau 分布拟合逐格点日降水的尾部，用大偏差理论估计极端降水重现期，并从拟合分布采样补充稀有样本，再投影到 CMIP6 未来情景。
+- 2604.16479 Latent-Compressed Variational Autoencoder for Video Diffusion Models — 视频 VAE 的 latent 通道越多，扩散生成越差，尽管重建变好。LC-VAE 在 latent 上做多级 3D Haar 小波，只保留低频子带供扩散使用，高频交给解码器补回，从而在同压缩比下兼顾重建与生成。
+- 2604.16643 WP-MIP: An Artificial Intelligence, Hybrid, and Physically Based Model Intercomparison Project for Weather Pre — 介绍 WMO 支持的全球确定性天气预报对比计划，涵盖 AI、混合（谱 nudging）和物理模型，给出数据库设计和初步的 RMSE/能谱评估。
+- 2604.16859 GAMMA-Net: Adaptive Long-Horizon Traffic Spatio-Temporal Forecasting Model based on Interleaved Graph Attentio — 交通图时空预测：图注意力与沿时间轴、空间轴的多轴 Mamba 交错堆叠（GAT、时间 Mamba、GAT、空间 Mamba），在 METR-LA、PEMS 等数据集上降低 MAE。
+- 2604.22808 FreqFormer: Hierarchical Frequency-Domain Attention with Adaptive Spectral Routing for Long-Sequence Video Dif — 长序列视频 DiT 的高效注意力：把 token 特征按频带拆开，低频做压缩全局注意、中频做块稀疏、高频做局部窗口，再按时间步做频带路由。全文只有 FLOPs/带宽的仿真分析，没有生成质量实验。
+- 2604.27313 PINN-Cast: Exploring the Role of Continuous-Depth NODE in Transformers and Physics Informed Loss as Soft Physi — 把 Transformer 的残差更新换成 Neural ODE，加一个“注意力 logits 有限差分”分支，再加动能/温度平流物理软约束，做 WeatherBench 5.625° 短期预报。
+- 2604.27696 FoReco and FoRecoML: A Unified Toolbox for Forecast Reconciliation in R — R 工具包：在截面、时间和截面-时间联合层级约束下，对多层级基础预报做线性（OLS/WLS/GLS 收缩协方差）或 ML 协调，支持非负约束和固定部分预报。
+- 2605.02908 Memorization In Stable Diffusion Is Unexpectedly Driven by CLIP Embeddings — 发现 SD1.4 的记忆化主要由条件序列里重复的 <eot>/<pad> 嵌入驱动：冗余令牌放大了唯一受过优化的全局摘要嵌入的影响。据此提出推理期缓解：替换 pad 令牌并把 v_eot 置零，或部分屏蔽 70% 的 pad 嵌入。
+- 2605.05054 Direct Product Flow Matching: Decoupling Radial and Angular Dynamics for Few-Shot Adaptation — 做 CLIP 少样本分类时，把特征对齐的流匹配拆成模长（径向）和方向（角向）两部分分别演化，使角向匀速，并用 time-shift 调度加 CFG 训练。
+- 2605.05520 Bayesian Rain Field Reconstruction using Commercial Microwave Links and Diffusion Model Priors — 把商用微波链路路径积分的非线性幂律衰减反演雨场做成贝叶斯逆问题：先验是在雷达雨强场上训练的扩散模型，比较多种免训练后验采样器。
+- 2605.05736 SDFlow: Similarity-Driven Flow Matching for Time Series Generation — 用冻结 VQ latent 中的非自回归流匹配替代 VQ+AR 生成，消除曝光偏差；配合低秩流形锚点先验初始化与码本上的分类后验（变分FM）。
+- 2605.06210 Super-Level-Set Regression: Conditional Quantiles via Volume Minimization — 做多元回归的预测区域：不先估计整个条件密度再切阈值，而是直接参数化并最小化条件最高密度区域（super-level set）的体积，同时满足 τ 条件覆盖。靠一个“收缩分位窗口”代理目标，化解体积目标与模型自身条件分位数之间的耦合。
+- 2605.07100 TRACE: Transport Alignment Conformal Prediction via Diffusion and Flow Matching Models — 用扩散/FM 模型沿随机传输轨迹平均的去噪误差或速度匹配误差作为非一致性分数，做多维输出的 split conformal 预测区域。
+- 2605.08424 Generalized Wasserstein Flow Matching: Transport Plans, Everywhere, All at Once — 把流匹配推广到“测度上的测度”（WoW，即点云集合）空间，用外层批内耦合加内层点匹配耦合（精确、sliced 或线性化 Wasserstein 近似）构造更直的速度场，用于点云和集合生成。
+- 2605.10439 Filtering Memorization from Parameter-Space in Diffusion Models — 只有 LoRA 权重、拿不到训练数据时，对扩散 LoRA 做免训练的事后去记忆化（BAF）：对 LoRA 增量做 SVD，保留与预训练权重主子空间对齐的奇异通道，压制对齐弱、携带记忆的通道。
+- 2605.13566 Spatiotemporal downscaling and nowcasting of urban land surface temperatures with deep neural networks — 用 U-Net 把 SEVIRI 的 3 km 地表温度降尺度到 MODIS 的 1 km，再在降尺度序列上为每个城市、每个 lead time 各训一个 ConvLSTM 做 15–75 分钟临近预报。
+- 2605.14317 Guided Diffusion Sampling for Precipitation Forecast Interventions — 做的是天气干预，不是预报精度：在 GenCast 的扩散采样中，每步对去噪残差估计施加一个区域降水削减目标的梯度引导，以生成比对抗扰动（AOWF）更物理合理的降水削减扰动。
+- 2605.15190 RAVEN: Real-time Autoregressive Video Extrapolation with Consistency-model GRPO — 因果自回归视频扩散蒸馏中，把 self-rollout 重排成'干净历史端点 + 噪声去噪态'交错序列来监督历史表征，再用 CM-GRPO 在一致性采样核上做在线 RL。
+- 2605.15466 Entity-Centric World Models: Interaction-Aware Masking for Causal Video Prediction — V-JEPA 自监督预训练时，按运动能量（时间二阶差分）挑出正在发生交互的高加速度 token 做掩码重建，想让表征学到因果动力学，而不是只学到静态纹理。
+- 2605.15618 Latent Video Prediction Learns Better World Models — 评测型研究：在五个鲁棒性轴上比较 V-JEPA 2/2.1、VideoPrism、VideoMAEv2 等冻结预训练视频模型，结论是 latent 预测目标比像素重建更鲁棒。
+- 2605.17248 Image-to-Video Diffusion: From Foundations to Open Frontiers — 图生视频扩散综述：按条件编码、时间建模、噪声先验、时空上采样四类核心设计给出分类法。
+- 2605.18793 Dimensional Balance Improves Large Scale Spatiotemporal Prediction Performance — 图结构时空预测（交通/气象站点/疫情）里，用空间与时间熵的失配作诊断：用低秩节点嵌入压缩空间维，同时把输入历史窗口拉长到天或周量级，来平衡两者。
+- 2605.19172 Bridge: Retrieval-Augmented Spatiotemporal Modeling for Urban Delivery Demand — 冷启动区域的配送需求预测：从时段匹配的记忆库中检索相似区域的未来轨迹作为先验，经零初始化的门控残差融合到图模型预测中；检索器用面向未来的对齐损失训练。
+- 2605.19242 PhyWorld: Physics-Faithful World Model for Video Generation — 对 Wan2.2-I2V-A14B 做两阶段后训练：先用 flow matching 微调视频续写，再用物理偏好对做 DPO，提升物理合理性。
+- 2605.19483 A dynamical systems view of training generative models and the memorization phenomenon — 纯理论。用常步长 SGD 的两时间尺度随机逼近加坍缩模型，把生成模型训练中的记忆化解释为“慢漂移下的间歇性坍缩”，并据此解释大步长和噪声为什么能抑制记忆化。
+- 2605.21094 UOTIP: Unbalanced Optimal Transport Map for Unpaired Inverse Problems — 把非配对图像逆问题建模为：从噪声测量分布到干净信号分布学习一个神经 UOT 映射（半对偶、对抗式，代价为似然代价加二次代价），以放宽边缘约束换取对多级噪声和类别不平衡的鲁棒性。
+- 2605.21388 On the Regularity and Generalization of One-Step Wasserstein-guided Generative Models for PDE-Induced Measures — 纯理论。证明几类 PDE 诱导的目标测度满足 doubling 条件，因而从均匀分布到目标的最优传输映射 Hölder 连续；并给出 DeepParticle 这类一步 W2 生成模型的超额风险界和目标漂移（OOD）界。
+- 2605.21402 Memorisation, convergence and generalisation in generative models — 在线性（高斯、spiked Wishart）生成模型里精确刻画三个转变：记忆化、收敛（独立训练的模型输出趋同）和主潜因子恢复。结论是“两个独立训练的模型输出一致”并不说明学到了主潜因子。
+- 2605.21507 Visibility nowcasting in South Korea: a machine learning approach to class imbalance and distribution shift — 韩国 6 个城市的能见度三分类临近预报（表格数据）。用 SMOTENC/CTGAN 过采样少数类，做 ML+DL 两级软投票集成，再用 SHAP 头号特征上的 Wasserstein 距离诊断训练年份与测试年份之间的分布漂移。
+- 2605.22050 Broken Memories: Detecting and Mitigating Memorization in Diffusion Models with Degraded Generations — 发现记忆化的生成在采样轨迹上表现为数值不稳定：潜变量更新范数会超出正常样本的统计区间。据此逐步检测，并把 ‖x̂0‖、‖z_t‖、‖δ_t‖ 投影回经验稳定区间，在采样过程中直接缓解记忆化。
+- 2605.23403 Hybrid Quantum-Classical Corrective Diffusion Modeling for Meteorological Downscaling — 在 CorrDiff（确定性 UNet 预测均值 + 扩散模型生成残差）框架中，把扩散 UNet 2×2 瓶颈层的部分通道换成变分量子电路，用于 HRRR-mini 10m 风场降尺度。验证集上 MAE/CRPS 略有改善，但到 2021 
+- 2605.23458 One-Forcing: Towards Stable One-Step Autoregressive Video Generation — 一步自回归视频蒸馏里，一致性蒸馏会丢运动、纯 DMD 会模糊；作者在 DMD 上加一个复用 fake-score 主干的噪声潜空间判别头（real 取真实数据），实现稳定的一步生成。
+- 2605.23778 The physics of AI weather models — 用逐日 RMSE 时间序列相关和 CKNNA 表征对齐，论证不同 AI 天气模型学到相似表征；提出“潜空间粒子梯度流”假说，并观察到 GraphCast/Aurora 浅层改大尺度、深层改小尺度。属理论/可解释性文章。
+- 2605.23993 Nano World Models: A Minimalist Implementation of Future Video Prediction — 极简开源的 diffusion-forcing 视频世界模型代码库，用控制变量实验比较预测参数化（x/ε/v）、模型规模、动作注入方式和采样步数对未来帧预测的影响。
+- 2605.24945 RealBench: Benchmarking Data-Driven Numerical Weather Forecasting Under Operational Conditions and Extreme Eve — 指出基于 ERA5 再分析的评测与业务条件不符：用 2025 年严格 OOD 测试集、业务分析场和 1 万站观测，对全球 AI 天气模型做热浪/寒潮/台风等极端事件评测。
+- 2605.25509 Guided Flow Matching for Forward and Inverse PDE Problems with Sparse Observations: Algorithm and Theory — FM4PDE：用 flow matching 学 PDE 系数与解的联合分布，推理时用'稀疏观测 + PDE 残差'复合损失的梯度引导采样，并给出确定性、随机、混合三种采样器的误差理论。
+- 2605.25554 PHGNet: Prototype-Guided Hypergraph Construction for Heterogeneous Spatiotemporal Forecasting — 交通预测中的空间异质性：用可学习原型库软分配节点，构造动态超图做高阶聚合，配合全局-局部节点表示、时间查询注意力和 backcast 残差堆叠。
+- 2605.26105 On-Policy Adversarial Flow Distillation for Autoregressive Video Generation — 黑盒教师只给成品视频时的自回归学生蒸馏：用同 prompt 配对的 Bradley–Terry 判别器给学生 rollout 打优势分，再经 DiffusionNFT 式正/负速度场加权 FM 更新学生（AFD）。
+- 2605.26401 Small-Area Precipitation Forecasting and Drought–Flood Early Warning with Reverse-Martingale Regularized Recur — 给 RNN 隐状态加反向一致性（reverse-martingale）惩罚，用残差驱动 Shiryaev–Roberts 序贯检测器，做干旱/洪涝 regime 变化预警；预报技巧与 GRU 持平。
+- 2605.26525 ReCA: Multi-Shot Long Video Extrapolation via Recursive Context Allocation — 多镜头长视频外推：用 LLM 分层递归规划来分配上下文，在叶节点调用冻结的短视频生成器，并跨时间传播结构化状态。
+- 2605.30705 Equivariant Latent Alignment via Flow Matching under Group Symmetries — 等变表征学习里，编码器潜变量与解析群作用不一致（ρ(g)Φ(x)≠Φ(g∘x)，即 latent misalignment）。作者用配对 flow matching 从解析变换后的潜变量输运到真实编码作残差校正，改善 SO(2)/SO(3)
+- 2605.30720 Kalimati Vegetable Price Index Forecasting with a Momentum Corrected Online Stacking Ensemble — 尼泊尔蔬菜价格指数预测：比较 14 个模型，提出在线 stacking，用滚动残差均值和残差斜率（动量）对基础混合预测做加性偏差修正。
+- 2606.02886 Scalable Uncertainty Quantification for Extreme Weather Forecasting via Empirical Neural Tangent Kernels — 对确定性 AI 天气大模型，用最后一层特征的经验 NTK（SVD/ICA 截断）构造 GP 后验方差作为事后认知不确定性，免重训，区分极端事件与常规天气。
+- 2606.03834 Let the Dynamics Flow: Stable Flow Matching Dynamical Systems — 机器人模仿学习：用 flow matching 参数化时间不变的动力系统，并通过软惩罚或结构硬约束（潜在 Lyapunov 函数，LaSalle 原理）保证渐近稳定，还推广到李群。
+- 2606.03971 Video-Mirai: Autoregressive Video Diffusion Models Need Foresight — 指出因果自回归视频扩散存在“表示级规划缺口”：训练期用冻结双向编码器读取完整 rollout（含未来段），以余弦损失把当前因果隐状态经小预测器对齐到未来特征，推理时丢弃编码器和预测器。
+- 2606.05328 The Invisible Hand of Physics: When Video Diffusion Models Know More Than They Show — 反向积分 FM 速度场，把真实视频反演回噪声，再对 DiT 各 block、各 t 的中间状态做线性探针。物理合理性可解码（WAN-1.3B 平均 81.27%），而 VAE 潜变量上只有随机水平。
+- 2606.06265 Robust Ensemble of Selectively Strengthened and Augmented Predictors — 针对对抗逃逸攻击的表格分类防御：按韧性指标（置换重要性加噪声敏感度）选特征子集，训练多个子分类器并做高斯噪声增强，推理时随机抽取部分子模型投票。
+- 2606.06682 Spatiotemporal Imputation with Graph-Informed Flow Matching — 时空插补任务中，把 FM 的高斯源分布换成对可观测信号做图拉普拉斯时空滤波得到的确定性“知情先验”，缩短传输路径、减少采样步数（GiFlow，ICML'26）。
+- 2606.07239 Generative Molecular Morphing for Flexible-Size Design via Unbalanced Optimal Transport — 变尺寸 3D 分子生成（Morph）：用离散 UOT（带插入/删除代价的增广 Hungarian 匹配）对齐原子数不同的源图和目标图，据此构造连续位置流加离散插入/删除跳跃过程的条件路径（Generator Matching）。
+- 2606.07695 DSFNet: Learning Dual-Domain Spectral Operators for Multi-Modality Spatio-Temporal Forecasting in Urban Transp — 解决多模态交通时空预测中的跨模态耦合问题：用特征域和空间域两套 FFT 谱滤波算子代替 GCN 或注意力，再加一个由外部变量（天气、节假日）控制的门控扩张卷积来处理时间维。
+- 2606.10499 MoE Enhanced Federated Learning for Spatiotemporal Prediction — 跨城市联邦交通预测：把各源城市的预测头作为专家，目标城市用 top-k 门控 MoE 融合，缓解数据稀缺和城市间异质性。
+- 2606.10642 PhysMetrics.Weather: An Evaluation Framework for Physical Consistency in ML Weather Models — 给全球 ML 天气模型（GraphCast/Pangu/FuXi/NeuralGCM/IFS）做物理一致性评估：质量/能量守恒漂移、谱能量保持（有效分辨率、谱残差、谱散度）、动力平衡。结论是确定性 MLWP 随 lead time 越来越平
+- 2606.12324 Assumption-Lean Shrinkage and Model Averaging for Spatial Parameters — 对大量含噪的空间单元估计（如社区经济流动性）建一个收缩估计器库，每个估计器编码一种关联定义（地理距离、邻接等），用 SURE（Stein 无偏风险估计）给出权重做模型平均。
+- 2606.13092 Certified World Models: Predictability Across Configuration, Horizon, and Resolution — 理论工作：给等变潜在世界模型一个可计算的可预测性证书，覆盖构型、时效和分辨率三个轴，并用 Lyapunov 谱给出误差随时效增长的规律；实验在 PushT、FetchPush、Lorenz-96 等玩具系统上。
+- 2606.13119 MP3: Multi-Period Pattern Pre-training for Spatio-Temporal Forecasting — 针对“时间海市蜃楼”（短窗输入相似但未来走向不同）：先从长历史序列预训练多周期模式（FFT 找周期、边卷积、全局 memory bank、用 DAG 因果掩码的跨周期 Transformer），再作为插件接到 STGNN 上。
+- 2606.14732 Steady-Forcing: Balancing Spatial Persistence and Motion Continuity in Long-Horizon Nature Video Diffusion — 固定机位长时自回归自然视频中“空间持续性 vs 运动连续性”的权衡：用 V-Sink 首帧锚、EMA-Sink 运动记忆、块相对 RoPE、周期性 KV 清洗，加上 Wan-14B 教师蒸馏。
+- 2606.16356 Simulation-Augmented Multi-Step Split Conformal Prediction for Aggregated Forecasts — 单变量月度时间序列的聚合目标（年总量、同比增长率）的预测区间：用扩展窗口交叉验证残差做 block bootstrap 模拟未来路径，再对聚合后轨迹取经验分位数得到区间。
+- 2606.17070 KFTD: Koopman-Fourier Time-Differentiable Network for Continuous Ocean Spatiotemporal Forecasting — 海洋场预报：两阶段训练，先训练插值器 I(x_t, x_t+h, j) 生成任意中间态（DYffusion 式，用时间插值代替扩散加噪），再训练前向器从中间态预测终态；主干是多尺度 Koopman 线性子空间加 Fourier 感知层，并加
+- 2606.17659 Physics-Constrained Neural Networks for Improved Short-Term Weather Forecasting: A Case Study over the South P — 改进 WeatherGFT 物理-神经混合块（WENO-5 求解器、单一共享自回归块），并移植到 PredFormer / IAM4VP 上，降低 1–12 h 多变量 RMSE。
+- 2606.17717 Double zero-inflated spatio-temporal modeling of daily precipitation under detection thresholds — 贝叶斯分层时空模型，区分真干（结构零）和低于雨量计检测阈值的删失零：零点质量用 probit+GP 建模，正值用 Gamma+GP，观测机制为阈值左删失；用于分析检测阈值对观测降水统计的影响。
+- 2606.19093 AIFS-DOP: End-to-End Medium-Range Weather Prediction from Observations Alone with Machine Learning — ECMWF 只用 40 年格点化观测（卫星、地面等，不用 NWP 或再分析）训练中期预报模型，对观测检验时与 IFS 相当；缺测输入先插补，缺测目标不计入损失。
+- 2606.19642 Rigorous uncertainty quantification of probabilistic AI weather forecasts with conformal prediction — 指出 GenCast、AIFS-ENS、NeuralGCM 的集合预报覆盖率不足，在极端事件上尤其差，于是在每个格点、每个前置时长上做在线自适应共形预测，校正集合分位区间。
+- 2606.20983 Physics-Guided Fully Convolutional Spatiotemporal Learning Toward Digital-Twin-Enabled Microstructure Evolutio — 在 SimVPv2 式全卷积时空预测器（gSTA 模块）上加入 Cahn–Hilliard 方程残差正则项（有限差分计算，仅在训练期使用），以提升相场微结构演化预测的长时效稳定性和物理一致性。
+- 2606.21080 Bayesian Model Averaging under Predictor Redundancy via Density-Ratio Posterior Compression — 预测变量冗余时，BMA 在各种支持集（support）上的后验质量会分散。本文用密度比度量压缩失真，把已算好的后验以硬或软的区域形式报告，属于统计报告问题。
+- 2606.23326 Online forecast reconciliation using linear models — 把层级（时间聚合）预测协调写成多元线性模型，用矩阵正态残差和岭回归/贝叶斯收缩估计协调权重，并用递推最小二乘做在线自适应更新（区域供热负荷案例）。
+- 2606.24076 A Non-Stationary Spatio-Temporal Covariance Model with Dynamic Advection Effects for Rainfall Data — 用若干带平流向量的时空协方差模型组成混合，允许风向在估计出的变点处切换（非平稳平流），MCMC 贝叶斯估计后做克里金 1 小时外推。
+- 2606.24563 An observationally constrained probabilistic trigger for organized deep convection in an NWP ensemble — 在 UM 集合 NWP 中，按总柱水汽和时空相关随机场以概率触发 MCS 顶重加热参数化，改善热带降水尺度与集合离散度-误差关系。
+- 2606.25003 Adaptive Joint Compression and Synchronisation in Federated Split Learning for IoT Rainfall Prediction — 系统类论文：在 IoT 降雨二分类的联邦分割学习中，按延迟联合调度激活量化压缩和同步间隔 ρ，以降低通信开销。
+- 2606.25201 FDN: Interpretable Spatiotemporal Forecasting with Future Decomposition Networks — 为可解释性，把未来预测写成对 K 个学习得到的未来模式基的 soft classification，再按分类概率加权插值（字典读出头）；用于水文、交通、能源图时序。
+- 2606.26699 Modelling convective cell occurrence in proximity to cold fronts using extreme gradient boosting — 以 ERA5 预测因子加 XGBoost，概率化建模德国夏季冷锋附近的对流单体（KONRAD 雷达 ≥46 dBZ 单体）发生频率，分析特征重要性与日变化。
+- 2606.29386 Interventional Flow Matching: Prospective Dose-Response Forecasting with Velocity-Field Jacobian Regularizatio — 血糖干预预测：条件 flow matching 以历史+计划治疗驱动为条件，对速度场关于驱动输入的 Jacobian 施加带符号、有界的敏感度惩罚，使干预响应符合生理方向。
+- 2606.29791 What Drives the Inlier-Memorization Effect? A Theory of Outlier Detection via Early Training Dynamics — 理论分析无监督离群检测中的内点记忆化效应：欠拟合的自编码器先记住稠密的内点、后记住稀疏的离群点，据此提出嵌入表征和 EMA 预热初始化来增强该效应。
+- 2606.30920 Conditional Tropical Cyclogenesis Rates via Rare-Event Sampling in a Neural Weather Emulator — 把统计力学的 Forward Flux Sampling（分级界面克隆轨迹）接到带随机层的神经天气模拟器上，以远低于直接集合的样本量估计热带气旋生成这类罕见事件的条件概率。
+- 2606.31110 Explaining Machine Learning and Memorization with Statistical Mechanics — 博士论文：在师生设定下用统计力学分析稠密 Hopfield 网络与 RBM 的学习/记忆化相变、对抗鲁棒性，并提出训练稳定化正则和层级加速训练算法。
+- 2607.00331 Coupling Precipitation Forecasting and Early Warning with Reverse-Martingale Recurrent Neural Networks — 与 2605.26401 同组同法（RMRNN）的扩展版：在四个气候区的站点逐日数据上，说明反向一致性惩罚在不损失预报技巧的前提下让隐状态更稳，其残差 CUSUM 能比 SPI-3 更早报警干旱。
+- 2607.01621 Spatial Support Matters: Geometry-Aware Graph Fusion for Rainfall Field Reconstruction — 用异质图神经网络，按测量支撑几何（0D 雨量计、1D 微波链路、2D 雷达/卫星格点）分层建节点，经跨支撑消息传递重建降雨场；采用归纳式 masked-node 协议，可在任意目标点预测。
+- 2607.02087 SUNTA: Hierarchical Video Prediction with Surprise-based Chunking — 分层 RSSM 做长时视频预测：在预测误差（surprise）的峰值处切 chunk；训练时各层解耦，避免层级坍塌；开环生成时用高层与低层 rollout 的不一致作为 top-down surprise 来决定边界。
+- 2607.02824 Enhancing a high resolution data-driven weather prediction model with surface descriptors — 在 MET Norway 的高分辨率数据驱动模型输入里加入地表描述符（SURFEX 地表分数、城市比例、地形邻域指数），降低 2m 温度和 10m 风的误差。
+- 2607.03279 From Global to Local: Efficient Regional Weather Downscaling with Global Weather Foundation Model — 在预训练 Aurora 的潜空间上挂轻量多分辨率 MLP 读出头，用 WRF 区域模拟作目标做区域降尺度，并同时对格点和站点观测检验。
+- 2607.03509 Flex-Forcing: Towards a Unified Autoregressive and Bidirectional Video Diffusion Model — 让同一个视频扩散模型在双向与自回归两种生成方式间灵活切换：分块粒度随帧位置和去噪步变化（高噪声阶段用大块，低噪声阶段用小块），并用随时间步变化的 K-Projection 对齐干净上下文与带噪 token 的噪声水平。
+- 2607.04190 Exploring Convolutional Neural Processes for Weather Downscaling — 硕士项目：用 ConvCNP 把 ERA5-Land 日最高温从 11km 降尺度到 1km 瑞士网格；高程 MLP 是必需组件，高斯似然导致严重过度自信。
+- 2607.05045 On the Genealogy of Machine Learning Weather Prediction — 综述与观点文：指出 ML 天气预报继承了 NWP 的初值问题/自回归时间步进框架，对比“科学代理建模”（状态条件算子）和“自由数据驱动建模”（演化算子、视频外推）两种范式，主张按数据或物理结构选模型。
+- 2607.05658 Integrating GNSS-Derived Zenith Wet Delay into a Weather Foundation Model Improves Precipitation Forecasting — 把 GNSS 导出的天顶湿延迟（ZWD，柱水汽）作为新变量接入 Aurora 基础模型并微调 6h 累积降水，极端阈值 ETS 提升明显，且小模型提升更大。
+- 2607.06091 Mass-Conserving Physics-Informed Neural Networks For The One-Dimensional Advection-Diffusion Equation — 在 1D 周期平流-扩散方程的 PINN 上加全局质量守恒软罚项，缓解长时间积分中的质量漂移，并与 Vanilla PINN 和 Crank-Nicolson 对比。
+- 2607.10984 EquiFusion: Kinematics-Agnostic Human Motion Prediction via Equivariant Latent Diffusion — 随机人体运动预测：用关节置换等变的潜空间扩散模型并把骨架连接作为输入，实现跨骨架零样本与遮挡输入预测。
+- 2607.13031 The Seriality Gap in Video Diffusion Models — 在多球硬球碰撞预测中，双向视频扩散的精度随依赖事件链变长而下降，增加去噪步数也补不回来。能增加串行计算的做法（加深网络、分块/自回归推理）效果明显更好。论文还证明，对确定性预测，去噪步不会提供骨干网络之外的串行计算。
+- 2607.13101 TSSM: Triaxial State Space Model for Global Station Weather Forecasting with Temporal-Variable-Historical Mode — 全球站点天气预报：把按周期对齐的历史年份样本堆成额外的历史轴，用 Mamba 沿时间、变量、历史三轴扫描，以提升极端事件（SEDI）捕获。
+- 2607.13108 STKAN: Kolmogorov-Arnold Networks for Spatio-Temporal Forecasting — 交通预测：用 Taylor 多项式 KAN 代替 MLP 做空间和时间 token mixing，配合软节点分组，以及时空自注意力。
+- 2607.16894 TVGL-CFM: Generating and Forecasting Time-Varying Trajectories of Dynamic Networks with Conditional Flow Match — 在 log-Euclidean 坐标里对 SPD 精度矩阵轨迹做非自回归条件流匹配生成和预报；预报时源分布改为以历史增量外推的随机游走暖启动先验，并在 x̂1 端点上加时间平滑项和历史→未来衔接项。
+- 2607.20368 Self Gradient Forcing: Native Long Video Extrapolation — 在 Self Forcing 的基础上做两遍训练：第一遍无梯度自回归 rollout 并记录上下文；第二遍并行重算上下文 KV 以回传梯度，让未来帧的损失能监督“历史如何写入 KV 记忆”，从而改善分钟级长视频外推。
+- 2607.20716 Spatial Generalization Tests for Machine Learning-based Weather Models to Assess Physical Consistency — Proposes three spatial generalization tests: rotate the planet in longitude, reverse latitude, reverse longitude (with m
+- 2607.23226 From Score Learning to Discretized Sampling: An End-to-End Generalization Analysis of Diffusion Models — 给出 ResNet 参数化 score 扩散模型的端到端泛化界，把生成误差（TV 距离）分解为前向截断、反向离散、有限样本+前向离散的泛化误差、优化误差四项。
+- 2607.24218 Every Client Is an Environment: Federated De-confounding for Spatio-Temporal Forecasting — Federated spatio-temporal (traffic) forecasting. Each client is treated as a causal environment, and a shared prototype 
+- 2607.26581 Benchmarking ConvLSTM for One-Day-Ahead IMDAA Rainfall-Field Prediction across Four Indian Cities — 在印度 4 个城市的 IMDAA 日尺度再分析小网格上，对比 ConvLSTM、FC-LSTM、持续性等 10 种方法做次日降水场预测。结论是 ConvLSTM 并不稳定优于简单基线；在高雨量日，神经模型系统性欠报，持续性的 POD 和 C
+- 2607.26811 DistillAlign: Coordinating Mode Covering and Mode Seeking in Autoregressive Video Distillation — Autoregressive video distillation. Pure DMD (reverse KL, mode-seeking) drifts toward high-density regions late in traini
+- 2607.27099 Rainfall is rough — 用临界、幂律核的 Hawkes 过程给单站分钟级雨量建模，并论证粗时间尺度上的累计雨量收敛到 Hurst≈0.01–0.1 的粗糙分数过程。它是单点时间序列的统计建模，不涉及空间场。
+- 2607.28058 Temporal Concentration from Rollout Errors: Implicit Preference Optimization for Text-to-Video Diffusion — 视频扩散的 DPO 后训练存在两个问题：偏好信号难得，稀疏的时间段伪影又被均匀监督稀释。本文把真实视频加噪后让模型自己去噪重建，原视频作正样本、重建作负样本（cIPO），且只在重建误差最大的连续时间窗上施加偏好损失。
+- 2607.28220 Weather Emulators at the Frontier of Heat Extremes Predictability — 评估6个AI天气模拟器（Pangu、FuXi、ArchesWeather、AIFS、GraphCast、Aurora）在10–15天对近地面温度和极端热的技巧：确定性技巧可以追平甚至超过IFS，但代价是频谱保真度下降（模糊），峰值强度欠报，
+- 2608.00064 Noise-Robust Conditional Flow Matching: Generating Clean Samples from Noisy Datasets — 只有带高斯噪声（已知协方差）的观测时训练 CFM，用 observed-bridge 的 Tweedie 式闭式/学习型修正，把速度场与终点读出纠正到干净分布，并在 t_cut<1 处一步跳到干净终点。
+- 2608.02923 Estimating Climate Sensitivity Using Bayesian Model Averaging for CMIP Models — 按与观测温度的一致性，用 BIC 型贝叶斯模型平均给 37 个 CMIP6 模型加权，估计 TCRE 并做温度投影。
+- 2608.07420 Beyond Myopic World Models: Long-Horizon End-to-End Training for Direct Future Prediction — 指出世界模型用一步损失训练、推理时递归 rollout，二者目标错配（误差被放大，梯度权重也错配）。提出 DPWM：给定初始观测和整段动作，单次前向直接预测第 K 步终点，K 在训练中随机采样。并证明换成长时终点目标后，递归基线也同样受益。
+- 2608.08563 Performance Evaluation of the WeatherEx Forecasting System (WFS) for Extreme Monsoon Rainfall over Kerala, 31  — 单次喀拉拉极端季风降水事件上，检验区域NWP＋AI后处理系统WFS的6km业务版和4km诊断版：6km整体误差小但极端漏报，4km保留局地极值但整体误差大。
+- 2608.09286 VeinCast: Physics-Guided Dynamic Field Graphs with Graph-Conditioned Fusion for Global Medium-Range Weather Fo — 69 个大气场的全球中期预报：在局地窗口内构建'物理先验关系 + 状态相关 Top-K 残差边'的场间动态图，再用图上下文和节点中心度引导场到潜空间的融合。
+- 2608.09971 Rescene: band-limited stochastic forcing turns a frozen neural weather operator into a climate emulator — 在冻结的确定性 ViT 天气算子外包 0.4M 参数的 wrapper：确定性“慢钟”把低通分量按时效向气候态混合，生成头注入谱形固定、限带（k≤20）的随机扰动，使冻结模型能稳定跑 100 年，同时恢复变率和集合校准。
+- 2608.11472 Gaussian Meta-Space Augmentation for Stacking Ensembles in Multimodal IPMN Risk Stratification — 在堆叠集成的元特征（对数概率）空间拟合类条件高斯（共享协方差），采样合成元样本注入组合器训练，用来正则化小数据上的高容量树组合器。
+- 2608.11601 How Can Driving World Models Do Counterfactual Prediction? — 指出驾驶世界模型的'动作条件直接预测'不等于反事实预测，因为它没有用到事实后续（缺少溯因）。本文在 CARLA 上构造带反事实真值的基准，并提出免训练流程：把事实观测搬运到反事实视角，再由冻结模型补全其余部分。
+- 2608.12271 Earth observation embeddings are effective sub-grid descriptors for probabilistic weather downscaling — 把 Tessera 卫星对地观测嵌入（10 m 分辨率）压缩成局地地表描述子，加进 ConvCNP，把 ERA5 25 km 场降尺度到站点的 2m 气温和 10m 风速，CRPS 分别提升 11.5% 和 6.2%。
+- 2608.13391 Context-Matched Distillation: Teacher Causality for Autoregressive Video Distillation — 做自回归视频的 DMD 蒸馏时，用因果教师替代双向教师来打分，使监督只依赖当时可得的历史与控制信号；并提出 Prefix Scoring（用学生实际 rollout 的前缀打分）和 Prefix Corruption（扰动早期不可靠前缀）。
+- 2608.14652 Pushing the Limits of High-Resolution Weather Forecasting through Data Scaling — 0.1° global forecasting is data-limited. Per-variable super-resolution synthesizes 0.1° training data from decades of 0.
+- 2608.17695 Magnitude-Direction Decoupling for Fast Video Generation with Flow Matching Models — 加速流匹配视频采样：在部分步中，速度的模长取自小模型，方向取自大模型的缓存残差，以此代替大模型推理，减少轨迹偏移；CFG 下还复用条件分支的模长。
+- 2608.20406 Machine Learning and ARIMA Model Averaging for Adaptive Public Health Forecasting: Comparative Evaluation and  — 对 ARIMA、RF、XGBoost 做按预报步长和响应设置分组的非负、和为 1 的性能加权平均（MLAMA），用滚动起点的样本外预测拟合权重。
+- 2608.21080 Flow-based surrogate models for particle tracking（注意：清单标题是 'Nipping the Butterfly Effect in the Bud: Self-Outp — 用 CFM 替代加速器粒子跟踪模拟（CERN PS）：机器参数作条件，把初始相空间分布映射到末态；加了对初始粒子集合的交叉注意力（CA-CFM），以及测试期引入少量真实跟踪粒子（Hybrid-CFM）。和清单里'自输出微调'那篇不是同一篇，
+- 2608.24651 AICON: An operational global machine learning weather forecasting model — 德国气象局（DWD）业务化的全球 GNN 天气模型（13 km、3h 步长，用 ICON-DREAM 训练）。训练上刻意不做多步 rollout 以保小尺度细节，并用从粗到细的分辨率迁移来加速收敛。
+- 2608.25604 Frequency-aware forecasting for short-term typhoon gust prediction — 台风期间单点阵风时间序列预报（ERA5），用可学习平稳小波分解＋FiLM跨频调制＋双分支编解码，分开建模趋势和波动，意在改善对阵风峰值的平滑。
+- 2608.25835 Missing the Butterfly and Predicting the Past: Features or Bugs of Accurate AI Weather Models? — Across ERA5, PlaSim and Lorenz 96, AI models can skilfully predict the past (backcast) yet show no butterfly effect. The
+- 2608.26693 High-Dimensional Spectral Limits for Gaussian KL-Unbalanced Optimal Transport — 纯理论：研究高斯 KL-UOT 协方差泛函在样本协方差、维数与样本量同阶时的随机矩阵极限（岭积谱、自由乘法卷积、MP 律、Bai–Silverstein 涨落），并给出罚项随维数缩放的临界尺度 τ_p≍p。
+- 2608.26794 Ring Forcing: Towards Precise Long-Term Memory for Autoregressive Video Diffusion — 用环形训练序列（正放视频拼接其倒放版本，让目标片段以倒放形式出现在远端历史中）迫使自回归视频模型学会从远历史中检索，从而在分钟级生成中保持物体恒存；配合历史压缩与稀疏 RoPE。
+- 2608.26902 Tether the Subject, Release the Scene: Query-Aware Memory Routing for Long-Horizon Autoregressive Video Genera — 长时自回归视频生成中，历史KV记忆把背景/视角钉死在旧状态（称为 memory-anchored scene under-progression）。本文在冻结生成器上不训练，按查询角色（主体/场景）、键区域和记忆年龄，在注意力logit上加
+- 2608.28010 When Can Conditional Flow Matching Replace Pointwise Negative Log-Likelihood? — Theory paper. Under linear Gaussian paths, the pointwise endpoint NLL decomposes exactly into entropy + weighted CFM + a
+- 2608.28404 How Far Can 5,500 Hours of Driving Take You? A Scaling Law Analysis of Video Diffusion Models — Scaling laws for driving-video diffusion models trained from scratch on a fixed corpus (1M–9B parameters). Loss improves
+- 2608.29029 Flow-JEPA: Flow Matching for Robust Latent Dynamics in JEPA World Models — 把 LeWM（JEPA 世界模型）的确定性逐步自回归预测器换成条件流匹配，在潜空间联合生成整段未来轨迹（源分布为高斯），同时保留 SIGReg 防止表征坍缩，以提升带视觉扰动时的规划鲁棒性。
+- 2608.29322 Test-Time Scaling for Video Diffusion Models via Diagnosis-Guided Candidate Recycling — Test-time scaling for video diffusion. Instead of generating, scoring and discarding, low-scoring candidates are diagnos
+- 2608.29640 LLMODE: Aligning ODEs with LLMs via Gated Token Injection for Irregular Spatio-Temporal Forecasting — 面向不规则采样的图时空预测：用图 ODE 重建连续时间潜轨迹，经 Perceiver 压缩成固定数量的记忆 token，再加上统计描述 token，通过门控交叉注意力注入冻结的 LLM。
+- 2609.03210 Improving precipitation forecasts in an AI weather model using observational data — AIFS-CRPS继承了ERA5降水的毛毛雨过报和极值欠报。作者把降水训练目标换成IMERG卫星观测后微调（Laxmi），全球降水CRPS改善，热带风暴重降水的POD/CSI提高。
+- 2609.03615 Auditing Patient Privacy in Medical Generative Models: Scalable Memorization Detection with DeepSSIM++ — 训练一个嵌入网络，使其余弦相似度近似 SSIM，用于大规模检测生成样本对训练样本的复制（记忆化审计）。
+- 2609.06187 SolarBench: A global solar energy nowcasting benchmark — 全球11站、600万+张天空/卫星图像的太阳辐照/光伏临近预报基准；发现深度模型平均误差优于persistence，但捕捉辐照突变（ramp）的能力很差。
+- 2609.09123 Mask Forcing: Improving Autoregressive Video Diffusion Distillation via Dual-Noise Masking Rollout — Self-Forcing 类 DMD 蒸馏会因反向 KL 的寻模倾向而过饱和、过平滑。本文在自 rollout 中随机把部分 token 重新加噪到更低噪声级（双噪声掩码），全局 timestep 条件保持不变，以扩大学生轨迹的覆盖范围，并
+- 2609.11265 Uncertainty DMD: Restoring Diversity in Few-Step Autoregressive Video Distillation — 少步 DMD 蒸馏后，自回归视频生成出现多样性坍缩：第一块在不同种子下趋同，确定性缓存再把坍缩传给后续块。本文在首块去噪时扰动 timestep 条件，并对写入缓存的块随机加噪，训练和推理用同一规则，以恢复样本多样性。
+- 2609.12496 TailWeather: from tail to extremes, a global climatological dataset for machine-learning weather forecasting — 基于ERA5构建全球陆地极端天气标签数据集（热浪、寒潮、强降水、大风、干旱），附带强度分数；指出平均误差低不等于能检出尾部事件。
+- 2609.15536 Physics-Guided Conditional Flow Matching with Energy Regularization for Robust PDE Inverse Problems — 针对稀疏且被污染的观测下的 PDE 反问题：第一阶段沿生成轨迹加 PDE 残差正则（PG-CFM），第二阶段用冻结教师给每个样本打能量分并据此重加权 FM 损失（ERFM）。
+- 2609.18118 Preservation of Log-Concavity and Convergence of Wasserstein-Fisher-Rao Gradient Flows — 纯理论：对满足曲率条件的强对数凹目标分布，证明 WFR 梯度流（Wasserstein 输运加 Fisher-Rao 生灭）保持强对数凹性，并给出对称 KL 的非渐近收敛率（W 部分与 FR 部分相加），不需要 warm-start。
+- 2609.18489 Butterfly Effect and the Kinetic Energy Cascade in Probabilistic Machine Learning Weather Prediction Models — 用 KE 与 DKE 谱诊断概率式 ML 气象模型是否再现升尺度能量传递和蝴蝶效应。
